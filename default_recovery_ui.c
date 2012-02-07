@@ -20,6 +20,11 @@
 #include "common.h"
 #include "extendedcommands.h"
 
+/*
+	to enable on-screen debug code printing set this to 1
+	to disable on-screen debug code printing set this to 0
+*/
+int TOUCH_CONTROL_DEBUG = 0;
 
 //In this case MENU_SELECT icon has maximum possible height.
 #define MENU_MAX_HEIGHT 80 //gr_get_height(gMenuIcon[MENU_SELECT])		//Maximum allowed height for navigation icons

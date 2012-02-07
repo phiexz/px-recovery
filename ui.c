@@ -397,6 +397,11 @@ static void ui_handle_mouse_input(int* curPos)
 		{  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),	get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
 	};
 
+if(TOUCH_CONTROL_DEBUG)
+{
+	ui_print("Touch gr_fb_width:\t%d,\tgr_fb_height:\t%d\n",gr_fb_width(),gr_fb_height());
+	ui_print("Touch X:\t%d,\tY:\t%d\n",curPos[1],curPos[2]);
+}
 
   if (show_menu) {
     if (curPos[0] > 0) {
@@ -853,6 +858,9 @@ struct keyStruct *ui_wait_key()
     }
 	key.code = key_queue[0];
     memcpy(&key_queue[0], &key_queue[1], sizeof(int) * --key_queue_len);
+
+if(TOUCH_CONTROL_DEBUG)
+	ui_print("[UI_WAIT_KEY] key code:\t%d\n",key.code);
 
 	if((key.code == BTN_GEAR_UP || key.code == BTN_MOUSE) && !actPos.pressure && oldMousePos[actPos.num].pressure && key_queue_len_back != (key_queue_len -1))
 	{	
