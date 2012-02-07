@@ -15,6 +15,19 @@
  */
 
 #include <linux/input.h>
+#include "recovery_ui.h"
+
+//these are included in the original kernel's linux/input.h but are missing from AOSP
+
+#ifndef SYN_MT_REPORT
+#define SYN_MT_REPORT 2
+#define ABS_MT_TOUCH_MAJOR  0x30  /* Major axis of touching ellipse */
+#define ABS_MT_WIDTH_MAJOR  0x32  /* Major axis of approaching ellipse */
+#define ABS_MT_POSITION_X 0x35  /* Center X ellipse position */
+#define ABS_MT_POSITION_Y 0x36  /* Center Y ellipse position */
+#define ABS_MT_TRACKING_ID 0x39  /* Center Y ellipse position */
+#endif
+
 #include <pthread.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -52,7 +65,7 @@ static int gShowBackButton = 0;
 #endif
 
 #define PROGRESSBAR_INDETERMINATE_STATES 6
-#define PROGRESSBAR_INDETERMINATE_FPS 15
+#define PROGRESSBAR_INDETERMINATE_FPS 24
 
 static pthread_mutex_t gUpdateMutex = PTHREAD_MUTEX_INITIALIZER;
 static gr_surface gBackgroundIcon[NUM_BACKGROUND_ICONS];
@@ -110,6 +123,28 @@ static pthread_mutex_t key_queue_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t key_queue_cond = PTHREAD_COND_INITIALIZER;
 static int key_queue[256], key_queue_len = 0;
 static volatile char key_pressed[KEY_MAX + 1];
+
+// Threads
+static pthread_t pt_ui_thread;
+static pthread_t pt_input_thread;
+static volatile int pt_ui_thread_active = 1;
+static volatile int pt_input_thread_active = 1;
+
+// Desire/Nexus and similar have 2, SGS has 5, SGT has 10, we take the max as it's cool. We'll only use 1 however
+#define MAX_MT_POINTS 10
+
+// Struct to store mouse events
+static struct mousePosStruct {
+  int x;
+  int y;
+  int pressure; // 0:up or 255:down
+  int size;
+  int num;
+  int length; // length of the line drawn while in touch state
+} actPos, grabPos, oldMousePos[MAX_MT_POINTS], mousePos[MAX_MT_POINTS];
+//Struct to return key events to recovery.c through ui_wait_key()
+volatile struct keyStruct key;
+
 
 // Clear the screen and draw the currently selected background icon (if any).
 // Should only be called with gUpdateMutex locked.
@@ -285,39 +320,113 @@ static void *progress_thread(void *cookie)
 // Reads input events, handles special hot keys, and adds to the key queue.
 static void *input_thread(void *cookie)
 {
-    int rel_sum = 0;
+    int rel_sum_x = 0;
+    int rel_sum_y = 0;
     int fake_key = 0;
-    for (;;) {
+    int got_data = 0;
+    while (pt_input_thread_active) {
         // wait for the next key event
         struct input_event ev;
         do {
-            ev_get(&ev, 0);
+          do {
+            got_data = ev_get(&ev, 1000/PROGRESSBAR_INDETERMINATE_FPS);
+            if (!pt_input_thread_active) {
+              pthread_exit(NULL);
+              return NULL;
+            }
+          } while (got_data==-1);
 
             if (ev.type == EV_SYN) {
-                continue;
+                // end of a multitouch point
+                if (ev.code == SYN_MT_REPORT) {
+                  if (actPos.num>=0 && actPos.num<MAX_MT_POINTS) {
+                    // create a fake keyboard event. We will use BTN_WHEEL, BTN_GEAR_DOWN and BTN_GEAR_UP key events to fake
+                    // TOUCH_MOVE, TOUCH_DOWN and TOUCH_UP in this order
+                    int type = BTN_WHEEL;
+                    // new and old pressure state are not consistent --> we have touch down or up event
+                    if ((mousePos[actPos.num].pressure!=0) != (actPos.pressure!=0)) {
+                      if (actPos.pressure == 0) {
+                        type = BTN_GEAR_UP;
+                        if (actPos.num==0) {
+                          if (mousePos[0].length<15) {
+                            // consider this a mouse click
+                            type = BTN_MOUSE;
+                          }
+                          memset(&grabPos,0,sizeof(grabPos));
+                        }
+                      } else if (actPos.pressure != 0) {
+                        type == BTN_GEAR_DOWN;
+                        if (actPos.num==0) {
+                          grabPos = actPos;
+                        }
+                      }
+                    }
+                    fake_key = 1;
+                    ev.type = EV_KEY;
+                    ev.code = type;
+                    ev.value = actPos.num+1;
+
+                    // this should be locked, but that causes ui events to get dropped, as the screen drawing takes too much time
+                    // this should be solved by making the critical section inside the drawing much much smaller
+                    if (actPos.pressure) {
+                      if (mousePos[actPos.num].pressure) {
+                        actPos.length = mousePos[actPos.num].length + abs(mousePos[actPos.num].x-actPos.x) + abs(mousePos[actPos.num].y-actPos.y);
+                      } else {
+                        actPos.length = 0;
+                      }
+                    } else {
+                      actPos.length = 0;
+                    }
+                    oldMousePos[actPos.num] = mousePos[actPos.num];
+                    mousePos[actPos.num] = actPos;
+					int curPos[] = {actPos.pressure, actPos.x, actPos.y};
+                    ui_handle_mouse_input(curPos);
+                  }
+
+                  memset(&actPos,0,sizeof(actPos));
+                } else {
+                  continue;
+                }
+            } else if (ev.type == EV_ABS) {
+              // multitouch records are sent as ABS events. Well at least on the SGS-i9000
+              if (ev.code == ABS_MT_POSITION_X) {
+                actPos.x = MT_X(ev.value);
+              } else if (ev.code == ABS_MT_POSITION_Y) {
+                actPos.y = MT_Y(ev.value);
+              } else if (ev.code == ABS_MT_TOUCH_MAJOR) {
+                actPos.pressure = ev.value; // on SGS-i9000 this is 0 for not-pressed and 40 for pressed
+              } else if (ev.code == ABS_MT_WIDTH_MAJOR) {
+                // num is stored inside the high byte of width. Well at least on SGS-i9000
+                if (actPos.num==0) {
+                  // only update if it was not already set. On a normal device MT_TRACKING_ID is sent
+                  actPos.num = ev.value >> 8;
+                }
+                actPos.size = ev.value & 0xFF;
+              } else if (ev.code == ABS_MT_TRACKING_ID) {
+                // on a normal device, the num is got from this value
+                actPos.num = ev.value;
+              }
             } else if (ev.type == EV_REL) {
                 if (ev.code == REL_Y) {
-                    // accumulate the up or down motion reported by
-                    // the trackball.  When it exceeds a threshold
-                    // (positive or negative), fake an up/down
-                    // key event.
-                    rel_sum += ev.value;
-                    if (rel_sum > 3) {
-                        fake_key = 1;
-                        ev.type = EV_KEY;
-                        ev.code = KEY_DOWN;
-                        ev.value = 1;
-                        rel_sum = 0;
-                    } else if (rel_sum < -3) {
-                        fake_key = 1;
-                        ev.type = EV_KEY;
-                        ev.code = KEY_UP;
-                        ev.value = 1;
-                        rel_sum = 0;
+                // accumulate the up or down motion reported by
+                // the trackball.  When it exceeds a threshold
+                // (positive or negative), fake an up/down
+                // key event.
+                    rel_sum_y += ev.value;
+                    if (rel_sum_y > 3) { fake_key = 1; ev.type = EV_KEY; ev.code = KEY_DOWN; ev.value = 1; rel_sum_y = 0;
+                    } else if (rel_sum_y < -3) { fake_key = 1; ev.type = EV_KEY; ev.code = KEY_UP; ev.value = 1; rel_sum_y = 0;
+                    }
+                }
+                // do the same for the X axis
+                if (ev.code == REL_X) {
+                    rel_sum_x += ev.value;
+                    if (rel_sum_x > 3) { fake_key = 1; ev.type = EV_KEY; ev.code = KEY_RIGHT; ev.value = 1; rel_sum_x = 0;
+                    } else if (rel_sum_x < -3) { fake_key = 1; ev.type = EV_KEY; ev.code = KEY_LEFT; ev.value = 1; rel_sum_x = 0;
                     }
                 }
             } else {
-                rel_sum = 0;
+                rel_sum_y = 0;
+                rel_sum_x = 0;
             }
         } while (ev.type != EV_KEY || ev.code > KEY_MAX);
 
@@ -331,8 +440,11 @@ static void *input_thread(void *cookie)
         fake_key = 0;
         const int queue_max = sizeof(key_queue) / sizeof(key_queue[0]);
         if (ev.value > 0 && key_queue_len < queue_max) {
+          // we don't want to pollute the queue with mouse move events
+          if (ev.code!=BTN_WHEEL || key_queue_len==0 || key_queue[key_queue_len-1]!=BTN_WHEEL) {
             key_queue[key_queue_len++] = ev.code;
-            pthread_cond_signal(&key_queue_cond);
+          }
+          pthread_cond_signal(&key_queue_cond);
         }
         pthread_mutex_unlock(&key_queue_mutex);
 
@@ -377,9 +489,16 @@ void ui_init(void)
         }
     }
 
-    pthread_t t;
-    pthread_create(&t, NULL, progress_thread, NULL);
-    pthread_create(&t, NULL, input_thread, NULL);
+    memset(&actPos, 0, sizeof(actPos));
+    memset(&grabPos, 0, sizeof(grabPos));
+    memset(mousePos, 0, sizeof(mousePos));
+    memset(oldMousePos, 0, sizeof(oldMousePos));
+
+    pt_ui_thread_active = 1;
+    pt_input_thread_active = 1;
+
+    pthread_create(&pt_ui_thread, NULL, progress_thread, NULL);
+    pthread_create(&pt_input_thread, NULL, input_thread, NULL);
 }
 
 char *ui_copy_image(int icon, int *width, int *height, int *bpp) {

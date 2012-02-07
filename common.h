@@ -29,6 +29,9 @@ int ui_text_visible();        // returns >0 if text log is currently visible
 void ui_show_text(int visible);
 void ui_clear_key_queue();
 
+// handle the user input events (mainly the touch events) inside the ui handler
+int device_handle_mouse(struct keyStruct *key, int visible);
+
 // Write a message to the on-screen log shown with Alt-L (also to stderr).
 // The screen is small, and users may need to report these messages to support,
 // so keep the output short and not too cryptic.
