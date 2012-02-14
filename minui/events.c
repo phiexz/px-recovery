@@ -345,7 +345,7 @@ int ev_get(struct input_event *ev, unsigned wait_time)
     unsigned n;
 
     do {
-		r = poll(ev_fds, ev_count, wait_time);
+    r = poll(ev_fds, ev_count, wait_time);
         if(r > 0) {
             for(n = 0; n < ev_count; n++) {
                 if(ev_fds[n].revents & POLLIN) {

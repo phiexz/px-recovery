@@ -81,11 +81,10 @@ enum {
 
 //Struct to return key events to recovery.c through ui_wait_key()
 struct keyStruct{
-	int code;
-	int x;
-	int y;
+  int code;
+  int x;
+  int y;
 };
-
 void ui_set_background(int icon);
 
 // Get a malloc'd copy of the screen image showing (only) the specified icon.

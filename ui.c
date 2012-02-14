@@ -18,7 +18,6 @@
 #include "recovery_ui.h"
 
 //these are included in the original kernel's linux/input.h but are missing from AOSP
-
 #ifndef SYN_MT_REPORT
 #define SYN_MT_REPORT 2
 #define ABS_MT_TOUCH_MAJOR  0x30  /* Major axis of touching ellipse */
@@ -47,7 +46,7 @@ extern int __system(const char *command);
 #ifdef BOARD_HAS_NO_SELECT_BUTTON
 static int gShowBackButton = 1;
 #else
-static int gShowBackButton = 0;
+static int gShowBackButton = 1;
 #endif
 
 #define MAX_COLS 96
@@ -83,13 +82,13 @@ static const struct { gr_surface* surface; const char *name; } BITMAPS[] = {
     { &gBackgroundIcon[BACKGROUND_ICON_CLOCKWORK],  "icon_clockwork" },
     { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_INSTALLING], "icon_firmware_install" },
     { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_ERROR], "icon_firmware_error" },
-	{ &gMenuIcon[MENU_BACK],      "icon_back" },
-    { &gMenuIcon[MENU_DOWN],  	  "icon_down" },
-    { &gMenuIcon[MENU_UP], 		  "icon_up" },
+    { &gMenuIcon[MENU_BACK],      "icon_back" },
+    { &gMenuIcon[MENU_DOWN],      "icon_down" },
+    { &gMenuIcon[MENU_UP],       "icon_up" },
     { &gMenuIcon[MENU_SELECT],    "icon_select" },
-	{ &gMenuIcon[MENU_BACK_M],    "icon_backM" },
+    { &gMenuIcon[MENU_BACK_M],    "icon_backM" },
     { &gMenuIcon[MENU_DOWN_M],    "icon_downM" },
-    { &gMenuIcon[MENU_UP_M], 	  "icon_upM" },
+    { &gMenuIcon[MENU_UP_M],     "icon_upM" },
     { &gMenuIcon[MENU_SELECT_M],  "icon_selectM" },
     { &gProgressBarIndeterminate[0],    "indeterminate1" },
     { &gProgressBarIndeterminate[1],    "indeterminate2" },
@@ -154,7 +153,6 @@ static struct mousePosStruct {
 } actPos, grabPos, oldMousePos[MAX_MT_POINTS], mousePos[MAX_MT_POINTS];
 //Struct to return key events to recovery.c through ui_wait_key()
 volatile struct keyStruct key;
-
 
 // Clear the screen and draw the currently selected background icon (if any).
 // Should only be called with gUpdateMutex locked.
@@ -241,13 +239,13 @@ static void draw_screen_locked(void)
 {
     if (!ui_has_initialized) return;
 
-//ToDo: Following structure should be global
-	struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
-		{  get_menu_icon_info(MENU_BACK,MENU_ICON_X),	get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),	get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_UP,MENU_ICON_X),	get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),	get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
-	};
+  //ToDo: Following structure should be global
+  struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
+    {  get_menu_icon_info(MENU_BACK,MENU_ICON_X),  get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_UP,MENU_ICON_X),  get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),  get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
+  };
 
     draw_background_locked(gCurrentIcon);
     draw_progress_locked();
@@ -261,10 +259,10 @@ static void draw_screen_locked(void)
         int row = 0;            // current row that we are drawing on
         if (show_menu) {
 
-			draw_icon_locked(gMenuIcon[MENU_BACK], MENU_ICON[MENU_BACK].x, MENU_ICON[MENU_BACK].y );
-			draw_icon_locked(gMenuIcon[MENU_DOWN], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
-			draw_icon_locked(gMenuIcon[MENU_UP], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
-			draw_icon_locked(gMenuIcon[MENU_SELECT], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
+      draw_icon_locked(gMenuIcon[MENU_BACK], MENU_ICON[MENU_BACK].x, MENU_ICON[MENU_BACK].y );
+      draw_icon_locked(gMenuIcon[MENU_DOWN], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
+      draw_icon_locked(gMenuIcon[MENU_UP], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
+      draw_icon_locked(gMenuIcon[MENU_SELECT], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
             gr_color(MENU_TEXT_COLOR);
             gr_fill(0, (menu_top + menu_sel - menu_show_start) * CHAR_HEIGHT,
                     gr_fb_width(), (menu_top + menu_sel - menu_show_start + 1)*CHAR_HEIGHT+1);
@@ -360,82 +358,82 @@ static void *progress_thread(void *cookie)
 int device_handle_mouse(struct keyStruct *key, int visible)
 {
 //ToDo: Following structure should be global
-	struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
-		{  get_menu_icon_info(MENU_BACK,MENU_ICON_X),	get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),	get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_UP,MENU_ICON_X),	get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),	get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
-	};
+  struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
+    {  get_menu_icon_info(MENU_BACK,MENU_ICON_X),  get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_UP,MENU_ICON_X),  get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),  get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
+  };
 
-	if (visible) {
-	int position;
+  if (visible) {
+  int position;
 
-	position = key->x;
+  position = key->x;
 
-		if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR)
-			return GO_BACK;
-		else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR)
-			return HIGHLIGHT_DOWN;
-		else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR)
-			return HIGHLIGHT_UP;
-		else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR)
-			return SELECT_ITEM;
+    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR)
+      return GO_BACK;
+    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR)
+      return HIGHLIGHT_DOWN;
+    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR)
+      return HIGHLIGHT_UP;
+    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR)
+      return SELECT_ITEM;
     }
-	return NO_ACTION;
+  return NO_ACTION;
 }
 
 // handle the user input events (mainly the touch events) inside the ui handler
 static void ui_handle_mouse_input(int* curPos)
 {
-	pthread_mutex_lock(&key_queue_mutex);
+  pthread_mutex_lock(&key_queue_mutex);
 
 //ToDo: Following structure should be global
-	struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
-		{  get_menu_icon_info(MENU_BACK,MENU_ICON_X),	get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),	get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_UP,MENU_ICON_X),	get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
-		{  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),	get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
-	};
+  struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
+    {  get_menu_icon_info(MENU_BACK,MENU_ICON_X),  get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_UP,MENU_ICON_X),  get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),  get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
+  };
 
 if(TOUCH_CONTROL_DEBUG)
 {
-	ui_print("Touch gr_fb_width:\t%d,\tgr_fb_height:\t%d\n",gr_fb_width(),gr_fb_height());
-	ui_print("Touch X:\t%d,\tY:\t%d\n",curPos[1],curPos[2]);
+  ui_print("Touch gr_fb_width:\t%d,\tgr_fb_height:\t%d\n",gr_fb_width(),gr_fb_height());
+  ui_print("Touch X:\t%d,\tY:\t%d\n",curPos[1],curPos[2]);
 }
 
   if (show_menu) {
     if (curPos[0] > 0) {
-		int position;
+    int position;
 
-		position = curPos[1];
+    position = curPos[1];
 
-		pthread_mutex_lock(&gUpdateMutex);
-		if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR ) {
-			draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );
-			draw_icon_locked(gMenuIcon[MENU_BACK_M], MENU_ICON[MENU_BACK].x, MENU_ICON[MENU_BACK].y );
-			selMenuIcon = MENU_BACK;
-			gr_flip();
-		}
-		else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR ) {			
-			draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );
-			draw_icon_locked(gMenuIcon[MENU_DOWN_M], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
-			selMenuIcon = MENU_DOWN;
-			gr_flip();
-		}
-		else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR ) {
-			draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );			
-			draw_icon_locked(gMenuIcon[MENU_UP_M], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
-			selMenuIcon = MENU_UP;
-			gr_flip();
-		}
-		else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR ) {
-			draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );			
-			draw_icon_locked(gMenuIcon[MENU_SELECT_M], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
-			selMenuIcon = MENU_SELECT;
-			gr_flip();
-		}
-		key_queue_len_back = key_queue_len;
-		pthread_mutex_unlock(&gUpdateMutex);
+    pthread_mutex_lock(&gUpdateMutex);
+    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR ) {
+      draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );
+      draw_icon_locked(gMenuIcon[MENU_BACK_M], MENU_ICON[MENU_BACK].x, MENU_ICON[MENU_BACK].y );
+      selMenuIcon = MENU_BACK;
+      gr_flip();
+    }
+    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR ) {      
+      draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );
+      draw_icon_locked(gMenuIcon[MENU_DOWN_M], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
+      selMenuIcon = MENU_DOWN;
+      gr_flip();
+    }
+    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR ) {
+      draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );      
+      draw_icon_locked(gMenuIcon[MENU_UP_M], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
+      selMenuIcon = MENU_UP;
+      gr_flip();
+    }
+    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR ) {
+      draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );      
+      draw_icon_locked(gMenuIcon[MENU_SELECT_M], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
+      selMenuIcon = MENU_SELECT;
+      gr_flip();
+    }
+    key_queue_len_back = key_queue_len;
+    pthread_mutex_unlock(&gUpdateMutex);
      }
   }
   pthread_mutex_unlock(&key_queue_mutex);
@@ -452,7 +450,7 @@ static void *input_thread(void *cookie)
         // wait for the next key event
         struct input_event ev;
         do {
-          do {
+           do {
             got_data = ev_get(&ev, 1000/PROGRESSBAR_INDETERMINATE_FPS);
             if (!pt_input_thread_active) {
               pthread_exit(NULL);
@@ -503,7 +501,7 @@ static void *input_thread(void *cookie)
                     }
                     oldMousePos[actPos.num] = mousePos[actPos.num];
                     mousePos[actPos.num] = actPos;
-					int curPos[] = {actPos.pressure, actPos.x, actPos.y};
+          int curPos[] = {actPos.pressure, actPos.x, actPos.y};
                     ui_handle_mouse_input(curPos);
                   }
 
@@ -856,21 +854,21 @@ struct keyStruct *ui_wait_key()
     while (key_queue_len == 0) {
         pthread_cond_wait(&key_queue_cond, &key_queue_mutex);
     }
-	key.code = key_queue[0];
+
+    key.code = key_queue[0];
     memcpy(&key_queue[0], &key_queue[1], sizeof(int) * --key_queue_len);
 
 if(TOUCH_CONTROL_DEBUG)
-	ui_print("[UI_WAIT_KEY] key code:\t%d\n",key.code);
+  ui_print("[UI_WAIT_KEY] key code:\t%d\n",key.code);
 
-	if((key.code == BTN_GEAR_UP || key.code == BTN_MOUSE) && !actPos.pressure && oldMousePos[actPos.num].pressure && key_queue_len_back != (key_queue_len -1))
-	{	
-		key.code = ABS_MT_POSITION_X;
-		key.x = oldMousePos[actPos.num].x;
-		key.y = oldMousePos[actPos.num].y;
-	}
-
+  if((key.code == BTN_GEAR_UP || key.code == BTN_MOUSE) && !actPos.pressure && oldMousePos[actPos.num].pressure && key_queue_len_back != (key_queue_len -1))
+  {  
+    key.code = ABS_MT_POSITION_X;
+    key.x = oldMousePos[actPos.num].x;
+    key.y = oldMousePos[actPos.num].y;
+  }
     pthread_mutex_unlock(&key_queue_mutex);
-	return &key;
+    return &key;
 }
 
 int ui_key_pressed(int key)

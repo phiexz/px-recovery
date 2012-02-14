@@ -467,16 +467,16 @@ get_menu_selection(char** headers, char** items, int menu_only,
     int wrap_count = 0;
 
     while (chosen_item < 0 && chosen_item != GO_BACK) {
-		struct keyStruct *key;
-		key = ui_wait_key();
+    struct keyStruct *key;
+    key = ui_wait_key();
 
         int visible = ui_text_visible();
 
-		int action;
-		if(key->code == ABS_MT_POSITION_X)
-	        action = device_handle_mouse(key, visible);
-		else
-	        action = device_handle_key(key->code, visible);
+    int action;
+    if(key->code == ABS_MT_POSITION_X)
+          action = device_handle_mouse(key, visible);
+    else
+          action = device_handle_key(key->code, visible);
 
         int old_selected = selected;
 
@@ -513,11 +513,9 @@ get_menu_selection(char** headers, char** items, int menu_only,
             if (wrap_count == 3) {
                 wrap_count = 0;
                 if (ui_get_showing_back_button()) {
-                    ui_print("Back menu button disabled.\n");
-                    ui_set_showing_back_button(0);
+                    ui_set_showing_back_button(1);
                 }
                 else {
-                    ui_print("Back menu button enabled.\n");
                     ui_set_showing_back_button(1);
                 }
             }
@@ -660,8 +658,12 @@ wipe_data(int confirm) {
         static char** title_headers = NULL;
 
         if (title_headers == NULL) {
-            char* headers[] = { "Confirm wipe of all user data?",
-                                "  THIS CAN NOT BE UNDONE.",
+            char* headers[] = { "Confirm wipe of ALL user data?",
+                                "following partitions will be WIPED:",
+                                "   /data",
+                                "   /cache",
+                                "   /sd-ext",
+                                "   /sdcard/.android_secure",
                                 "",
                                 NULL };
             title_headers = prepend_title((const char**)headers);
@@ -669,24 +671,17 @@ wipe_data(int confirm) {
 
         char* items[] = { " No",
                           " No",
-                          " No",
-                          " No",
-                          " No",
-                          " No",
-                          " No",
-                          " Yes -- delete all user data",   // [7]
-                          " No",
-                          " No",
+                          " Yes -- delete ALL user data",   // [2]
                           " No",
                           NULL };
 
         int chosen_item = get_menu_selection(title_headers, items, 1, 0);
-        if (chosen_item != 7) {
+        if (chosen_item != 2) {
             return;
         }
     }
 
-    ui_print("\n-- Wiping data...\n");
+    ui_print("\n-- Performing Factory Reset...\n");
     device_wipe_data();
     erase_volume("/data");
     erase_volume("/cache");
@@ -695,7 +690,7 @@ wipe_data(int confirm) {
     }
     erase_volume("/sd-ext");
     erase_volume("/sdcard/.android_secure");
-    ui_print("Data wipe complete.\n");
+    ui_print("Factory Reset complete.\n");
 }
 
 static void
@@ -959,7 +954,10 @@ main(int argc, char **argv) {
         }
     }
 
-    if (status != INSTALL_SUCCESS && !is_user_initiated_recovery) ui_set_background(BACKGROUND_ICON_ERROR);
+    if (status != INSTALL_SUCCESS && !is_user_initiated_recovery) {
+        ui_set_show_text(1);
+        ui_set_background(BACKGROUND_ICON_ERROR);
+    }
     if (status != INSTALL_SUCCESS || ui_text_visible()) {
         prompt_and_wait();
     }

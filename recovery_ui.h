@@ -82,10 +82,10 @@ extern char* MENU_HEADERS[];
 // Text of menu items.
 extern char* MENU_ITEMS[];
 
-#define MENU_ICON_X			0
-#define MENU_ICON_Y			1
-#define MENU_ICON_XL		2
-#define MENU_ICON_XR		3
+#define MENU_ICON_X      0
+#define MENU_ICON_Y      1
+#define MENU_ICON_XL    2
+#define MENU_ICON_XR    3
 
 extern int TOUCH_CONTROL_DEBUG;
 
