@@ -428,9 +428,54 @@ copy_sideloaded_package(const char* original_path) {
   return strdup(copy_path);
 }
 
+int get_battery_level(void)
+{
+    static int lastVal = -1;
+    static time_t nextSecCheck = 0;
+
+    struct timeval curTime;
+    gettimeofday(&curTime, NULL);
+    if (curTime.tv_sec > nextSecCheck)
+    {
+        char cap_s[4];
+        FILE * cap = fopen("/sys/class/power_supply/battery/capacity","rt");
+        if (cap)
+        {
+            fgets(cap_s, 4, cap);
+            fclose(cap);
+            lastVal = atoi(cap_s);
+            if (lastVal > 100)  lastVal = 100;
+            if (lastVal < 0)    lastVal = 0;
+        }
+        nextSecCheck = curTime.tv_sec + 60;
+    }
+    return lastVal;
+}
+
+char* 
+print_batt_cap()  {
+	char* full_cap_s = (char*)malloc(30);
+	char full_cap_a[30];
+	
+	int cap_i = get_battery_level();
+    
+	// Get a usable time
+	struct tm *current;
+	time_t now;
+	now = time(0);
+	current = localtime(&now);
+	
+	sprintf(full_cap_a, "Battery Level: %i%% @ %02D:%02D", cap_i, current->tm_hour, current->tm_min);
+	strcpy(full_cap_s, full_cap_a);
+	
+	return full_cap_s;
+}
+
 static char**
 prepend_title(char** headers) {
     char* title[] = { EXPAND(RECOVERY_VERSION),
+                      "",
+                      print_batt_cap(),
                       "",
                       NULL };
 

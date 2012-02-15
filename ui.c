@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <errno.h>
+#include <fcntl.h>
 #include <linux/input.h>
 #include "recovery_ui.h"
 
@@ -33,7 +35,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/reboot.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -54,6 +58,8 @@ static int gShowBackButton = 1;
 
 #define MENU_MAX_COLS 64
 #define MENU_MAX_ROWS 250
+
+#define MIN_LOG_ROWS 3
 
 #ifndef BOARD_LDPI_RECOVERY
   #define CHAR_WIDTH 10
@@ -121,11 +127,13 @@ static char text[MAX_ROWS][MAX_COLS];
 static int text_cols = 0, text_rows = 0;
 static int text_col = 0, text_row = 0, text_top = 0;
 static int show_text = 0;
+static int show_text_ever = 0;   // has show_text ever been 1?
 
 static char menu[MENU_MAX_ROWS][MENU_MAX_COLS];
 static int show_menu = 0;
 static int menu_top = 0, menu_items = 0, menu_sel = 0;
 static int menu_show_start = 0;             // this is line which menu display is starting at
+static int max_menu_rows;
 
 // Key event input queue
 static pthread_mutex_t key_queue_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -254,8 +262,10 @@ static void draw_screen_locked(void)
         gr_color(0, 0, 0, 160);
         gr_fill(0, 0, gr_fb_width(), gr_fb_height());
 
+        int total_rows = gr_fb_height() / CHAR_HEIGHT;
         int i = 0;
         int j = 0;
+        int offset = 0;         // offset of separating bar under menus
         int row = 0;            // current row that we are drawing on
         if (show_menu) {
 
@@ -273,8 +283,8 @@ static void draw_screen_locked(void)
                 row++;
             }
 
-            if (menu_items - menu_show_start + menu_top >= MAX_ROWS)
-                j = MAX_ROWS - menu_top;
+            if (menu_items - menu_show_start + menu_top >= max_menu_rows)
+                j = max_menu_rows - menu_top;
             else
                 j = menu_items - menu_show_start;
 
@@ -289,14 +299,29 @@ static void draw_screen_locked(void)
                     draw_text_line(i - menu_show_start, menu[i]);
                 }
                 row++;
+                if (row >= max_menu_rows)
+                    break;
             }
-            gr_fill(0, row*CHAR_HEIGHT+CHAR_HEIGHT/2-1,
-                    gr_fb_width(), row*CHAR_HEIGHT+CHAR_HEIGHT/2+1);
+
+            if (menu_items <= max_menu_rows)
+                offset = 1;
+
+            gr_fill(0, (row-offset)*CHAR_HEIGHT+CHAR_HEIGHT/2-1,
+                    gr_fb_width(), (row-offset)*CHAR_HEIGHT+CHAR_HEIGHT/2+1);
         }
 
         gr_color(NORMAL_TEXT_COLOR);
-        for (; row < text_rows; ++row) {
-            draw_text_line(row, text[(row+text_top) % text_rows]);
+        int cur_row = text_row;
+        int available_rows = total_rows - row - 1;
+        int start_row = row + 1;
+        if (available_rows < MAX_ROWS)
+            cur_row = (cur_row + (MAX_ROWS - available_rows)) % MAX_ROWS;
+        else
+            start_row = total_rows - MAX_ROWS;
+
+        int r;
+        for (r = 0; r < (available_rows < MAX_ROWS ? available_rows : MAX_ROWS); r++) {
+            draw_text_line(start_row + r, text[(cur_row + r) % MAX_ROWS]);
         }
     }
 }
@@ -592,6 +617,9 @@ void ui_init(void)
 
     text_col = text_row = 0;
     text_rows = gr_fb_height() / CHAR_HEIGHT;
+    max_menu_rows = text_rows - MIN_LOG_ROWS;
+    if (max_menu_rows > MENU_MAX_ROWS)
+        max_menu_rows = MENU_MAX_ROWS;
     if (text_rows > MAX_ROWS) text_rows = MAX_ROWS;
     text_top = 1;
 
@@ -774,14 +802,17 @@ int ui_start_menu(char** headers, char** items, int initial_selection) {
         for (; i < MENU_MAX_ROWS; ++i) {
             if (items[i-menu_top] == NULL) break;
             strcpy(menu[i], MENU_ITEM_HEADER);
-            strncpy(menu[i] + MENU_ITEM_HEADER_LENGTH, items[i-menu_top], text_cols-1 - MENU_ITEM_HEADER_LENGTH);
-            menu[i][text_cols-1] = '\0';
+            strncpy(menu[i] + MENU_ITEM_HEADER_LENGTH, items[i-menu_top], MENU_MAX_COLS - 1 - MENU_ITEM_HEADER_LENGTH);
+            menu[i][MENU_MAX_COLS-1] = '\0';
         }
 
         if (gShowBackButton) {
             strcpy(menu[i], " - +++++Go Back+++++");
             ++i;
         }
+        
+        strcpy(menu[i], " ");
+        ++i;
 
         menu_items = i - menu_top;
         show_menu = 1;
@@ -802,16 +833,16 @@ int ui_menu_select(int sel) {
         old_sel = menu_sel;
         menu_sel = sel;
 
-        if (menu_sel < 0) menu_sel = menu_items + menu_sel;
-        if (menu_sel >= menu_items) menu_sel = menu_sel - menu_items;
+        if (menu_sel < 0) menu_sel = menu_items-1 + menu_sel;
+        if (menu_sel >= menu_items-1) menu_sel = menu_sel - menu_items+1;
 
 
         if (menu_sel < menu_show_start && menu_show_start > 0) {
             menu_show_start = menu_sel;
         }
 
-        if (menu_sel - menu_show_start + menu_top >= text_rows) {
-            menu_show_start = menu_sel + menu_top - text_rows + 1;
+        if (menu_sel - menu_show_start + menu_top >= max_menu_rows) {
+            menu_show_start = menu_sel + menu_top - max_menu_rows + 1;
         }
 
         sel = menu_sel;
@@ -840,10 +871,19 @@ int ui_text_visible()
     return visible;
 }
 
+int ui_text_ever_visible()
+{
+    pthread_mutex_lock(&gUpdateMutex);
+    int ever_visible = show_text_ever;
+    pthread_mutex_unlock(&gUpdateMutex);
+    return ever_visible;
+}
+
 void ui_show_text(int visible)
 {
     pthread_mutex_lock(&gUpdateMutex);
     show_text = visible;
+    if (show_text) show_text_ever = 1;
     update_screen_locked();
     pthread_mutex_unlock(&gUpdateMutex);
 }
