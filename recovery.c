@@ -476,7 +476,6 @@ prepend_title(char** headers) {
     char* title[] = { EXPAND(RECOVERY_VERSION),
                       "",
                       print_batt_cap(),
-                      "",
                       NULL };
 
     // count the number of lines in our title, plus the

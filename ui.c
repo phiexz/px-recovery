@@ -53,13 +53,22 @@ static int gShowBackButton = 1;
 static int gShowBackButton = 1;
 #endif
 
-#define MAX_COLS 96
-#define MAX_ROWS 32
+#ifndef BOARD_LDPI_RECOVERY
+  #define MAX_COLS 88
+  #define MAX_ROWS 30
+#else
+  #define MAX_COLS 96
+  #define MAX_ROWS 32
+#endif
 
 #define MENU_MAX_COLS 64
 #define MENU_MAX_ROWS 250
 
-#define MIN_LOG_ROWS 3
+#ifndef BOARD_LDPI_RECOVERY
+  #define MIN_LOG_ROWS 5
+#else
+  #define MIN_LOG_ROWS 3
+#endif
 
 #ifndef BOARD_LDPI_RECOVERY
   #define CHAR_WIDTH 10
@@ -810,9 +819,6 @@ int ui_start_menu(char** headers, char** items, int initial_selection) {
             strcpy(menu[i], " - +++++Go Back+++++");
             ++i;
         }
-        
-        strcpy(menu[i], " ");
-        ++i;
 
         menu_items = i - menu_top;
         show_menu = 1;
