@@ -53,22 +53,13 @@ static int gShowBackButton = 1;
 static int gShowBackButton = 1;
 #endif
 
-#ifndef BOARD_LDPI_RECOVERY
-  #define MAX_COLS 88
-  #define MAX_ROWS 30
-#else
-  #define MAX_COLS 96
-  #define MAX_ROWS 32
-#endif
+#define MAX_COLS 96
+#define MAX_ROWS 30
 
 #define MENU_MAX_COLS 64
 #define MENU_MAX_ROWS 250
 
-#ifndef BOARD_LDPI_RECOVERY
-  #define MIN_LOG_ROWS 5
-#else
-  #define MIN_LOG_ROWS 3
-#endif
+#define MIN_LOG_ROWS 3
 
 #ifndef BOARD_LDPI_RECOVERY
   #define CHAR_WIDTH 10
@@ -248,7 +239,7 @@ static void draw_text_line(int row, const char* t) {
 //#define MENU_TEXT_COLOR 255, 160, 49, 255
 #define MENU_TEXT_COLOR 0, 191, 255, 255
 #define NORMAL_TEXT_COLOR 200, 200, 200, 255
-#define HEADER_TEXT_COLOR NORMAL_TEXT_COLOR
+#define HEADER_TEXT_COLOR 255, 160, 49, 255
 
 // Redraw everything on the screen.  Does not flip pages.
 // Should only be called with gUpdateMutex locked.
@@ -819,6 +810,9 @@ int ui_start_menu(char** headers, char** items, int initial_selection) {
             strcpy(menu[i], " - +++++Go Back+++++");
             ++i;
         }
+
+        strcpy(menu[i], " ");
+        ++i;
 
         menu_items = i - menu_top;
         show_menu = 1;
