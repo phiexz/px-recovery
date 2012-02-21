@@ -885,6 +885,134 @@ void wipe_battery_stats()
     ui_print("Battery Stats Wiped.\n");
 }
 
+static long tmplog_offset = 0;
+
+static int
+erase_volume(const char *volume) {
+    ui_set_background(BACKGROUND_ICON_INSTALLING);
+    ui_show_indeterminate_progress();
+    ui_print("Formatting %s...\n", volume);
+
+    if (strcmp(volume, "/cache") == 0) {
+        // Any part of the log we'd copied to cache is now gone.
+        // Reset the pointer so we copy from the beginning of the temp
+        // log.
+        tmplog_offset = 0;
+    }
+
+    return format_volume(volume);
+}
+
+static void
+wipe_data(int confirm) {
+    if (confirm) {
+        static char** title_headers = NULL;
+
+        if (title_headers == NULL) {
+            char* headers[] = { "Confirm wipe of ALL user data?",
+                                "following partitions will be WIPED:",
+                                "   /data",
+                                "   /cache",
+                                "   /sd-ext",
+                                "   /sdcard/.android_secure",
+                                "",
+                                NULL };
+            //title_headers = prepend_title((const char**)headers);
+        }
+
+        char* items[] = { " No",
+                          " No",
+                          " Yes -- delete ALL user data",   // [2]
+                          " No",
+                          NULL };
+
+        int chosen_item = get_menu_selection(title_headers, items, 1, 0);
+        if (chosen_item != 2) {
+            return;
+        }
+    }
+
+    ui_print("\n-- Performing Factory Reset...\n");
+    device_wipe_data();
+    erase_volume("/data");
+    erase_volume("/cache");
+    if (has_datadata()) {
+        erase_volume("/datadata");
+    }
+    erase_volume("/sd-ext");
+    erase_volume("/sdcard/.android_secure");
+    ui_print("Factory Reset complete.\n");
+}
+
+void show_wipe_menu()
+{
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Wipe & Factory Reset menu",
+                                "",
+                                NULL
+    };
+    
+    static char* list[] = { "Wipe Cache",
+                            "Wipe Data",
+                            "Wipe Dalvik Cache",
+                            "Wipe Battery Stats",
+                            NULL
+    };
+    
+    for (;;)
+    {
+	int chosen_item = get_menu_selection(headers, list, 0, 0);
+        if (chosen_item == GO_BACK)
+            break;
+        switch (chosen_item)
+	{
+	    case 0:
+	    {
+	      static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+					  NULL
+	      };
+		if (confirm_selection("Confirm wipe?", "Yes - Wipe Cache"))
+                {
+                    ui_print("\n-- Wiping cache...\n");
+                    erase_volume("/cache");
+                    ui_print("Cache wipe complete.\n");
+                    if (!ui_text_visible()) return;
+                }
+                break;
+	    }
+		
+            case 1:
+            {
+                wipe_data(ui_text_visible());
+		if (!ui_text_visible()) return;
+                break;
+            }
+            case 2:
+            {
+                if (0 != ensure_path_mounted("/data"))
+                    break;
+                ensure_path_mounted("/sd-ext");
+                ensure_path_mounted("/cache");
+                if (confirm_selection( "Confirm wipe?", "Yes - Wipe Dalvik Cache")) {
+                    __system("rm -r /data/dalvik-cache");
+                    __system("rm -r /cache/dalvik-cache");
+                    __system("rm -r /sd-ext/dalvik-cache");
+                    ui_print("Dalvik Cache wiped.\n");
+                }
+                ensure_path_unmounted("/data");
+                break;
+            }
+            case 3:
+            {
+                if (confirm_selection( "Confirm wipe?", "Yes - Wipe Battery Stats"))
+                    wipe_battery_stats();
+                break;
+            }
+	}
+    }
+}
+
 void show_reboot_menu()
 {
     static char* headers[] = {  "Menu for Reboot Phone",
@@ -931,10 +1059,7 @@ void show_advanced_menu()
                                 NULL
     };
 
-    static char* list[] = { "Reboot Recovery",
-                            "Wipe Dalvik Cache",
-                            "Wipe Battery Stats",
-                            "Report Error",
+    static char* list[] = { "Report Error",
                             "Key Test",
                             "Show log",
                             "Partition SD Card",
@@ -952,7 +1077,7 @@ void show_advanced_menu()
             break;
         switch (chosen_item)
         {
-            case 0:
+            /*case 0:
             {
                 reboot_wrapper("recovery");
                 break;
@@ -978,10 +1103,11 @@ void show_advanced_menu()
                     wipe_battery_stats();
                 break;
             }
-            case 3:
+            */
+            case 0:
                 handle_failure(1);
                 break;
-            case 4:
+            case 1:
             {
                 ui_print("Outputting key codes.\n");
                 ui_print("Go back to end debugging.\n");
@@ -1008,12 +1134,12 @@ void show_advanced_menu()
                 while (action != GO_BACK);
                 break;
             }
-            case 5:
+            case 2:
             {
                 ui_printlogtail(12);
                 break;
             }
-            case 6:
+            case 3:
             {
                if (confirm_selection("Confirm: SDCARD will be wiped!!", "Yes - Continue with SDCARD Partitioning"))
                 {
@@ -1072,7 +1198,7 @@ void show_advanced_menu()
 
                 break;
             }
-            case 7:
+            case 4:
             {
                 ensure_path_mounted("/system");
                 ensure_path_mounted("/data");
@@ -1081,7 +1207,7 @@ void show_advanced_menu()
                 ui_print("Done!\n");
                 break;
             }
-            case 8:
+            case 5:
             {
                 static char* ext_sizes[] = { "128M",
                                              "256M",

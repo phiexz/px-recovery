@@ -696,7 +696,7 @@ sdcard_directory(const char* path) {
     return result;
 }
 
-static void
+/*static void
 wipe_data(int confirm) {
     if (confirm) {
         static char** title_headers = NULL;
@@ -736,6 +736,7 @@ wipe_data(int confirm) {
     erase_volume("/sdcard/.android_secure");
     ui_print("Factory Reset complete.\n");
 }
+*/
 
 static void
 prompt_and_wait() {
@@ -759,12 +760,13 @@ prompt_and_wait() {
                 poweroff=0;
                 return;
 
-            case ITEM_WIPE_DATA:
-                wipe_data(ui_text_visible());
-                if (!ui_text_visible()) return;
+            case ITEM_WIPE_MENU:
+                //wipe_data(ui_text_visible());
+                //if (!ui_text_visible()) return;
+                show_wipe_menu();
                 break;
 
-            case ITEM_WIPE_CACHE:
+            /*case ITEM_WIPE_CACHE:
                 if (confirm_selection("Confirm wipe?", "Yes - Wipe Cache"))
                 {
                     ui_print("\n-- Wiping cache...\n");
@@ -773,8 +775,9 @@ prompt_and_wait() {
                     if (!ui_text_visible()) return;
                 }
                 break;
-
-            case ITEM_APPLY_SDCARD:
+		*/
+	    
+            /*case ITEM_APPLY_SDCARD:
                 if (confirm_selection("Confirm install?", "Yes - Install /sdcard/update.zip"))
                 {
                     ui_print("\n-- Install from sdcard...\n");
@@ -789,6 +792,8 @@ prompt_and_wait() {
                     }
                 }
                 break;
+		*/
+	    
             case ITEM_INSTALL_ZIP:
                 show_install_update_menu();
                 break;
