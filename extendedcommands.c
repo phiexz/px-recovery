@@ -885,6 +885,45 @@ void wipe_battery_stats()
     ui_print("Battery Stats Wiped.\n");
 }
 
+void show_reboot_menu()
+{
+    static char* headers[] = {  "Menu for Reboot Phone",
+                                "",
+                                NULL
+    };
+    
+    static char* list[] = { "Reboot to System",
+                            "Reboot to Recovery",
+                            "Reboot to Download Mode",
+                            NULL
+    };
+    
+    for (;;)
+    {
+	int chosen_item = get_menu_selection(headers, list, 0, 0);
+        if (chosen_item == GO_BACK)
+            break;
+        switch (chosen_item)
+	{
+	    case 0:
+            {
+                reboot_wrapper("");
+                break;
+            }
+            case 1:
+            {
+                reboot_wrapper("recovery");
+                break;
+            }
+            case 2:
+            {
+                reboot_wrapper("download");
+                break;
+            }
+	}
+    }
+}
+
 void show_advanced_menu()
 {
     static char* headers[] = {  "Advanced and Debugging Menu",

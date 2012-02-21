@@ -465,7 +465,7 @@ print_batt_cap()  {
 	now = time(0);
 	current = localtime(&now);
 	
-	sprintf(full_cap_a, "Battery Level: %i%% @ %02D:%02D", cap_i, current->tm_hour, current->tm_min);
+	sprintf(full_cap_a, "   |Batt: %i%% | Time: %02D:%02D|", cap_i, current->tm_hour, current->tm_min);
 	strcpy(full_cap_s, full_cap_a);
 	
 	return full_cap_s;
@@ -474,8 +474,8 @@ print_batt_cap()  {
 static char**
 prepend_title(char** headers) {
     char* title[] = { EXPAND(RECOVERY_VERSION),
-                      "",
-                      print_batt_cap(),
+		      "",
+		      print_batt_cap(),
                       NULL };
 
     // count the number of lines in our title, plus the
@@ -801,9 +801,9 @@ prompt_and_wait() {
             case ITEM_ADVANCED:
                 show_advanced_menu();
                 break;
-            case ITEM_POWEROFF:
-                poweroff=1;
-                return;
+            case ITEM_REBOOT_MENU:
+                show_reboot_menu();
+                break;
         }
     }
 }
@@ -860,7 +860,7 @@ main(int argc, char **argv) {
     printf("Starting recovery on %s", ctime(&start));
 
     ui_init();
-    ui_print(EXPAND(RECOVERY_VERSION)"\n");
+    //ui_print(EXPAND(RECOVERY_VERSION)"\n");
     load_volume_table();
     process_volumes();
     LOGI("Processing arguments.\n");

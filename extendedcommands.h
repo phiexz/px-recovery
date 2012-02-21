@@ -40,6 +40,8 @@ __system(const char *command);
 void
 show_advanced_menu();
 
+void show_reboot_menu();
+
 int format_unknown_device(const char *device, const char* path, const char *fs_type);
 
 void
