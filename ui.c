@@ -88,14 +88,14 @@ static const struct { gr_surface* surface; const char *name; } BITMAPS[] = {
     { &gBackgroundIcon[BACKGROUND_ICON_CLOCKWORK],  "icon_clockwork" },
     { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_INSTALLING], "icon_firmware_install" },
     { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_ERROR], "icon_firmware_error" },
-    { &gMenuIcon[MENU_BACK],      "icon_back" },
-    { &gMenuIcon[MENU_DOWN],      "icon_down" },
-    { &gMenuIcon[MENU_UP],       "icon_up" },
-    { &gMenuIcon[MENU_SELECT],    "icon_select" },
-    { &gMenuIcon[MENU_BACK_M],    "icon_backM" },
-    { &gMenuIcon[MENU_DOWN_M],    "icon_downM" },
-    { &gMenuIcon[MENU_UP_M],     "icon_upM" },
-    { &gMenuIcon[MENU_SELECT_M],  "icon_selectM" },
+    { &gMenuIcon[MENU_BACK],     	"icon_back" },
+    { &gMenuIcon[MENU_DOWN],     	"icon_down" },
+    { &gMenuIcon[MENU_UP],       	"icon_up" },
+    { &gMenuIcon[MENU_SELECT],   	"icon_select" },
+    { &gMenuIcon[MENU_BACK_M],   	"icon_backM" },
+    { &gMenuIcon[MENU_DOWN_M],   	"icon_downM" },
+    { &gMenuIcon[MENU_UP_M],     	"icon_upM" },
+    { &gMenuIcon[MENU_SELECT_M], 	"icon_selectM" },
     { &gProgressBarIndeterminate[0],    "indeterminate1" },
     { &gProgressBarIndeterminate[1],    "indeterminate2" },
     { &gProgressBarIndeterminate[2],    "indeterminate3" },
@@ -237,9 +237,9 @@ static void draw_text_line(int row, const char* t) {
 }
 
 //#define MENU_TEXT_COLOR 255, 160, 49, 255
-#define MENU_TEXT_COLOR 0, 191, 255, 255
+#define MENU_TEXT_COLOR 255, 22, 100, 255
 #define NORMAL_TEXT_COLOR 200, 200, 200, 255
-#define HEADER_TEXT_COLOR 255, 160, 49, 255
+#define HEADER_TEXT_COLOR NORMAL_TEXT_COLOR
 
 // Redraw everything on the screen.  Does not flip pages.
 // Should only be called with gUpdateMutex locked.
