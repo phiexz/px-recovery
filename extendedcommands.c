@@ -94,7 +94,9 @@ char* INSTALL_MENU_ITEMS[] = {  "choose zip from sdcard",
 
 void show_install_update_menu()
 {
-    static char* headers[] = {  "Apply update from .zip file on SD card",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Apply update from .zip file on SD card",
                                 "",
                                 NULL
     };
@@ -320,7 +322,9 @@ void show_choose_zip_menu(const char *mount_point)
         return;
     }
 
-    static char* headers[] = {  "Choose a zip to apply",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Choose a zip to apply",
                                 "",
                                 NULL
     };
@@ -342,7 +346,9 @@ void show_nandroid_restore_menu(const char* path)
         return;
     }
 
-    static char* headers[] = {  "Choose an image to restore",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Choose an image to restore",
                                 "",
                                 NULL
     };
@@ -376,7 +382,9 @@ void show_mount_usb_storage_menu()
         close(fd);
         return -1;
     }
-    static char* headers[] = {  "USB Mass Storage device",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"USB Mass Storage device",
                                 "Leaving this menu unmount",
                                 "your SD card from your PC.",
                                 "",
@@ -604,7 +612,9 @@ int is_safe_to_format(char* name)
 
 void show_partition_menu()
 {
-    static char* headers[] = {  "Mounts and Storage Menu",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Mounts and Storage Menu",
                                 "",
                                 NULL
     };
@@ -750,7 +760,9 @@ void show_nandroid_advanced_restore_menu(const char* path)
     if (file == NULL)
         return;
 
-    static char* headers[] = {  "Nandroid Advanced Restore",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Nandroid Advanced Restore",
                                 "",
                                 NULL
     };
@@ -803,7 +815,9 @@ void show_nandroid_advanced_restore_menu(const char* path)
 
 void show_nandroid_menu()
 {
-    static char* headers[] = {  "Nandroid",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Nandroid",
                                 "",
                                 NULL
     };
@@ -969,7 +983,7 @@ void show_wipe_menu()
 	{
 	    case 0:
 	    {
-	      static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+	      static char* headers[] = {  "asdf",
 					  NULL
 	      };
 		if (confirm_selection("Confirm wipe?", "Yes - Wipe Cache"))
@@ -1015,7 +1029,9 @@ void show_wipe_menu()
 
 void show_reboot_menu()
 {
-    static char* headers[] = {  "Menu for Reboot Phone",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Menu for Reboot Phone",
                                 "",
                                 NULL
     };
@@ -1054,7 +1070,9 @@ void show_reboot_menu()
 
 void show_advanced_menu()
 {
-    static char* headers[] = {  "Advanced and Debugging Menu",
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Advanced and Debugging Menu",
                                 "",
                                 NULL
     };
