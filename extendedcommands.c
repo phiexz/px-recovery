@@ -917,47 +917,6 @@ erase_volume(const char *volume) {
     return format_volume(volume);
 }
 
-static void
-wipe_data(int confirm) {
-    if (confirm) {
-        static char** title_headers = NULL;
-
-        if (title_headers == NULL) {
-            char* headers[] = { "Confirm wipe of ALL user data?",
-                                "following partitions will be WIPED:",
-                                "   /data",
-                                "   /cache",
-                                "   /sd-ext",
-                                "   /sdcard/.android_secure",
-                                "",
-                                NULL };
-            //title_headers = prepend_title((const char**)headers);
-        }
-
-        char* items[] = { " No",
-                          " No",
-                          " Yes -- delete ALL user data",   // [2]
-                          " No",
-                          NULL };
-
-        int chosen_item = get_menu_selection(title_headers, items, 1, 0);
-        if (chosen_item != 2) {
-            return;
-        }
-    }
-
-    ui_print("\n-- Performing Factory Reset...\n");
-    device_wipe_data();
-    erase_volume("/data");
-    erase_volume("/cache");
-    if (has_datadata()) {
-        erase_volume("/datadata");
-    }
-    erase_volume("/sd-ext");
-    erase_volume("/sdcard/.android_secure");
-    ui_print("Factory Reset complete.\n");
-}
-
 void show_wipe_menu()
 {
     static char* headers[] = {  EXPAND(RECOVERY_VERSION),
@@ -968,7 +927,7 @@ void show_wipe_menu()
     };
     
     static char* list[] = { "Wipe Cache",
-                            "Wipe Data",
+                            "Wipe Data (Factory Reset)",
                             "Wipe Dalvik Cache",
                             "Wipe Battery Stats",
                             NULL
@@ -998,8 +957,21 @@ void show_wipe_menu()
 		
             case 1:
             {
-                wipe_data(ui_text_visible());
-		if (!ui_text_visible()) return;
+		if (confirm_selection("Confirm Factory Reset?", "Yes - Factory Reset"))
+                {
+                    ui_print("\n-- Performing Factory Reset...\n");
+                    device_wipe_data();
+		    erase_volume("/data");
+		    erase_volume("/cache");
+		    if (has_datadata()) {
+			erase_volume("/datadata");
+		    }
+		    erase_volume("/sd-ext");
+		    erase_volume("/sdcard/.android_secure");
+		    ui_print("Factory Reset complete.\n");
+                    if (!ui_text_visible()) return;
+                }
+		
                 break;
             }
             case 2:
