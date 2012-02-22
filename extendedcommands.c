@@ -339,6 +339,38 @@ void show_choose_zip_menu(const char *mount_point)
         install_zip(file);
 }
 
+
+void show_choose_apk_menu(const char *mount_point)
+{
+    if (ensure_path_mounted(mount_point) != 0) {
+        LOGE ("Can't mount %s\n", mount_point);
+        return;
+    }
+
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Choose an apk to push",
+                                "",
+                                NULL
+    };
+
+    char* file = choose_file_menu(mount_point, ".apk", headers);
+    if (file == NULL)
+        return;
+    static char* confirm_install  = "Confirm install?";
+    static char confirm[PATH_MAX];
+    sprintf(confirm, "Yes - Install %s", basename(file));
+    if (confirm_selection(confirm_install, confirm))
+    {
+	ui_print("\n-- Push APK to system --\n");
+	ui_print("%s", basename(file));
+	ui_print("\n-- UNDER CONSTRUCTION --\n");
+	ui_print("\n-- MASIH BERMASALAH --\n");
+	ensure_path_mounted("/system");
+	ensure_path_unmounted("/system");
+    }
+}
+
 void show_nandroid_restore_menu(const char* path)
 {
     if (ensure_path_mounted(path) != 0) {
@@ -1103,6 +1135,7 @@ void show_advanced_menu()
                             "Partition SD Card",
                             "Fix Permissions",
 			    "Set Brightness Level",
+			    "Push apk to system",
                             NULL
     };
 
@@ -1273,6 +1306,11 @@ void show_advanced_menu()
 		      break;
 		  }
 		}
+	    }
+	    case 6:
+	    {
+		show_choose_apk_menu("/sdcard/");
+                break;
 	    }
         }
     }
