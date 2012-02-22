@@ -83,11 +83,11 @@ static int ui_log_stdout = 1;
 static int selMenuIcon = 0;
 
 static const struct { gr_surface* surface; const char *name; } BITMAPS[] = {
-    { &gBackgroundIcon[BACKGROUND_ICON_INSTALLING], "icon_installing" },
-    { &gBackgroundIcon[BACKGROUND_ICON_ERROR],      "icon_error" },
-    { &gBackgroundIcon[BACKGROUND_ICON_CLOCKWORK],  "icon_clockwork" },
-    { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_INSTALLING], "icon_firmware_install" },
-    { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_ERROR], "icon_firmware_error" },
+    { &gBackgroundIcon[BACKGROUND_ICON_INSTALLING], "icon_px" },
+    { &gBackgroundIcon[BACKGROUND_ICON_ERROR],      "icon_px" },
+    { &gBackgroundIcon[BACKGROUND_ICON_CLOCKWORK],  "icon_px" },
+    { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_INSTALLING], "icon_px" },
+    { &gBackgroundIcon[BACKGROUND_ICON_FIRMWARE_ERROR], "icon_px" },
     { &gMenuIcon[MENU_BACK],     	"icon_back" },
     { &gMenuIcon[MENU_DOWN],     	"icon_down" },
     { &gMenuIcon[MENU_UP],       	"icon_up" },
