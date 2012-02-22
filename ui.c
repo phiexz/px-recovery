@@ -259,7 +259,7 @@ static void draw_screen_locked(void)
     draw_progress_locked();
 
     if (show_text) {
-        gr_color(0, 0, 0, 160);
+        gr_color(0, 0, 0, 0);
         gr_fill(0, 0, gr_fb_width(), gr_fb_height());
 
         int total_rows = gr_fb_height() / CHAR_HEIGHT;
@@ -656,7 +656,7 @@ char *ui_copy_image(int icon, int *width, int *height, int *bpp) {
     draw_background_locked(gBackgroundIcon[icon]);
     *width = gr_fb_width();
     *height = gr_fb_height();
-    *bpp = sizeof(gr_pixel) * 8;
+    *bpp = sizeof(gr_pixel) * 16;
     int size = *width * *height * sizeof(gr_pixel);
     char *ret = malloc(size);
     if (ret == NULL) {
