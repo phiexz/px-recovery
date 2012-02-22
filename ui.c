@@ -312,7 +312,7 @@ static void draw_screen_locked(void)
 
         gr_color(NORMAL_TEXT_COLOR);
         int cur_row = text_row;
-        int available_rows = total_rows - row - 1;
+        int available_rows = total_rows - row - 3;
         int start_row = row + 1;
         if (available_rows < MAX_ROWS)
             cur_row = (cur_row + (MAX_ROWS - available_rows)) % MAX_ROWS;
