@@ -26,7 +26,10 @@ void
 show_nandroid_menu();
 
 void
-show_partition_menu();
+show_mount_menu();
+
+void
+show_format_menu();
 
 void
 show_choose_zip_menu();

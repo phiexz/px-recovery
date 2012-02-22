@@ -800,8 +800,11 @@ prompt_and_wait() {
             case ITEM_NANDROID:
                 show_nandroid_menu();
                 break;
-            case ITEM_PARTITION:
-                show_partition_menu();
+            case ITEM_MOUNT:
+                show_mount_menu();
+                break;
+	    case ITEM_FORMAT:
+                show_format_menu();
                 break;
             case ITEM_ADVANCED:
                 show_advanced_menu();
