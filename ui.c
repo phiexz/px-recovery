@@ -392,16 +392,18 @@ int device_handle_mouse(struct keyStruct *key, int visible)
 
   if (visible) {
   int position;
+  int positionY;
 
   position = key->x;
+  positionY = key->y;
 
-    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR)
+    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR && positionY > 430)
       return GO_BACK;
-    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR)
+    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR && positionY > 430)
       return HIGHLIGHT_DOWN;
-    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR)
+    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR && positionY > 430)
       return HIGHLIGHT_UP;
-    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR)
+    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR && positionY > 430)
       return SELECT_ITEM;
     }
   return NO_ACTION;
