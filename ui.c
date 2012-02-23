@@ -435,25 +435,25 @@ if(TOUCH_CONTROL_DEBUG)
     position = curPos[1];
 
     pthread_mutex_lock(&gUpdateMutex);
-    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR ) {
+    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR && curPos[2] > 430 ) {
       draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );
       draw_icon_locked(gMenuIcon[MENU_BACK_M], MENU_ICON[MENU_BACK].x, MENU_ICON[MENU_BACK].y );
       selMenuIcon = MENU_BACK;
       gr_flip();
     }
-    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR ) {      
+    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR && curPos[2] > 430 ) {      
       draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );
       draw_icon_locked(gMenuIcon[MENU_DOWN_M], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
       selMenuIcon = MENU_DOWN;
       gr_flip();
     }
-    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR ) {
+    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR && curPos[2] > 430 ) {
       draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );      
       draw_icon_locked(gMenuIcon[MENU_UP_M], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
       selMenuIcon = MENU_UP;
       gr_flip();
     }
-    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR ) {
+    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR && curPos[2] > 430 ) {
       draw_icon_locked(gMenuIcon[selMenuIcon], MENU_ICON[selMenuIcon].x, MENU_ICON[selMenuIcon].y );      
       draw_icon_locked(gMenuIcon[MENU_SELECT_M], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
       selMenuIcon = MENU_SELECT;
