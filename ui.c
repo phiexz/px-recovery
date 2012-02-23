@@ -251,8 +251,8 @@ static void draw_screen_locked(void)
   //ToDo: Following structure should be global
   struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
     {  get_menu_icon_info(MENU_BACK,MENU_ICON_X),  get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
-    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
     {  get_menu_icon_info(MENU_UP,MENU_ICON_X),  get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
     {  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),  get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
   };
 
@@ -386,8 +386,8 @@ int device_handle_mouse(struct keyStruct *key, int visible)
 //ToDo: Following structure should be global
   struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
     {  get_menu_icon_info(MENU_BACK,MENU_ICON_X),  get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
-    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
     {  get_menu_icon_info(MENU_UP,MENU_ICON_X),  get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
     {  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),  get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
   };
 
@@ -418,8 +418,8 @@ static void ui_handle_mouse_input(int* curPos)
 //ToDo: Following structure should be global
   struct { int x; int y; int xL; int xR; } MENU_ICON[] = {
     {  get_menu_icon_info(MENU_BACK,MENU_ICON_X),  get_menu_icon_info(MENU_BACK,MENU_ICON_Y), get_menu_icon_info(MENU_BACK,MENU_ICON_XL), get_menu_icon_info(MENU_BACK,MENU_ICON_XR) },
-    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
     {  get_menu_icon_info(MENU_UP,MENU_ICON_X),  get_menu_icon_info(MENU_UP,MENU_ICON_Y), get_menu_icon_info(MENU_UP,MENU_ICON_XL), get_menu_icon_info(MENU_UP,MENU_ICON_XR) },
+    {  get_menu_icon_info(MENU_DOWN,MENU_ICON_X),  get_menu_icon_info(MENU_DOWN,MENU_ICON_Y), get_menu_icon_info(MENU_DOWN,MENU_ICON_XL), get_menu_icon_info(MENU_DOWN,MENU_ICON_XR) },
     {  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),  get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
   };
 
