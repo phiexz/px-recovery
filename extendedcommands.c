@@ -1312,6 +1312,7 @@ void show_advanced_menu()
 		      break;
 		  }
 		}
+	      break;
 	    }
 	    case 6:
 	    {
