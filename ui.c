@@ -205,7 +205,8 @@ static void draw_progress_locked()
     int height = gr_get_height(gProgressBarEmpty);
 
     int dx = (gr_fb_width() - width)/2;
-    int dy = (3*gr_fb_height() + iconHeight - 2*height)/4;
+    //int dy = (3*gr_fb_height() + iconHeight - 2*height)/4;
+    int dy = gr_fb_height() - 2*height;
 
     // Erase behind the progress bar (in case this was a progress-only update)
     gr_color(0, 0, 0, 255);
