@@ -123,11 +123,7 @@ void show_install_update_menu()
             }
             case ITEM_CHOOSE_ZIP:
 	    {
-		ensure_path_mounted("/system");
-		ensure_path_mounted("/data");
                 show_choose_zip_menu("/sdcard/");
-		ensure_path_unmounted("/system");
-		ensure_path_unmounted("/data");
                 break;
 	    }
 	    case ITEM_CHOOSE_ZIP_INT:
