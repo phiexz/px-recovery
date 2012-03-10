@@ -1131,7 +1131,8 @@ void show_advanced_menu()
                                 NULL
     };
 
-    static char* list[] = { "Report Error",
+    static char* list[] = { "Enable/Disable Vibrate",
+			    "Report Error",
                             "Key Test",
                             "Show log",
                             "Partition SD Card",
@@ -1175,10 +1176,36 @@ void show_advanced_menu()
                 break;
             }
             */
-            case 0:
+	    case 0:
+	    {
+		static char* vibrate_stat[] = { "Enable",
+						"Disable",
+						 NULL };
+					     
+		static char* vibrate_headers[] = { "Enable/Disable Vibrate", "", NULL };
+		
+		int vibra = get_menu_selection(vibrate_headers, vibrate_stat, 0, 0);
+                if (vibra == GO_BACK)
+                    break;
+		switch (vibra)
+		{
+		  case 0:
+		  {
+		       __system("chmod 644 /sys/class/timed_output/vibrator/enable");
+		      break;
+		  }
+		  case 1:
+		  {
+		      __system("chmod 444 /sys/class/timed_output/vibrator/enable");
+		      break;
+		  }
+		}
+	      break;
+	    }
+            case 1:
                 handle_failure(1);
                 break;
-            case 1:
+            case 2:
             {
                 ui_print("Outputting key codes.\n");
                 ui_print("Go back to end debugging.\n");
@@ -1205,12 +1232,12 @@ void show_advanced_menu()
                 while (action != GO_BACK);
                 break;
             }
-            case 2:
+            case 3:
             {
                 ui_printlogtail(12);
                 break;
             }
-            case 3:
+            case 4:
             {
                if (confirm_selection("Confirm: SDCARD will be wiped!!", "Yes - Continue with SDCARD Partitioning"))
                 {
@@ -1269,7 +1296,7 @@ void show_advanced_menu()
 
                 break;
             }
-            case 4:
+            case 5:
             {
                 ensure_path_mounted("/system");
                 ensure_path_mounted("/data");
@@ -1278,7 +1305,7 @@ void show_advanced_menu()
                 ui_print("Done!\n");
                 break;
             }
-            case 5:
+            case 6:
 	    {
 		static char* brightness_level[] = { "Low",
 						    "Medium",
@@ -1310,7 +1337,7 @@ void show_advanced_menu()
 		}
 	      break;
 	    }
-	    case 6:
+	    case 7:
 	    {
 		show_choose_apk_menu("/sdcard/");
                 break;

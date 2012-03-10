@@ -398,14 +398,22 @@ int device_handle_mouse(struct keyStruct *key, int visible)
   position = key->x;
   positionY = key->y;
 
-    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR && positionY > 430)
+    if(position > MENU_ICON[MENU_BACK].xL && position < MENU_ICON[MENU_BACK].xR && positionY > 430){
+      __system("echo 30 > /sys/class/timed_output/vibrator/enable");
       return GO_BACK;
-    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR && positionY > 430)
+    }
+    else if(position > MENU_ICON[MENU_DOWN].xL && position < MENU_ICON[MENU_DOWN].xR && positionY > 430){
+      __system("echo 30 > /sys/class/timed_output/vibrator/enable");
       return HIGHLIGHT_DOWN;
-    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR && positionY > 430)
+    }
+    else if(position > MENU_ICON[MENU_UP].xL && position < MENU_ICON[MENU_UP].xR && positionY > 430){
+      __system("echo 30 > /sys/class/timed_output/vibrator/enable");
       return HIGHLIGHT_UP;
-    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR && positionY > 430)
+    }
+    else if(position > MENU_ICON[MENU_SELECT].xL && position < MENU_ICON[MENU_SELECT].xR && positionY > 430){
+      __system("echo 30 > /sys/class/timed_output/vibrator/enable");
       return SELECT_ITEM;
+    }
     }
   return NO_ACTION;
 }
