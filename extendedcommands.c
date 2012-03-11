@@ -45,6 +45,7 @@
 
 #define ABS_MT_POSITION_X 0x35  /* Center X ellipse position */
 
+int vib = 1;
 int signature_check_enabled = 1;
 int script_assert_enabled = 1;
 static const char *SDCARD_UPDATE_FILE = "/sdcard/update.zip";
@@ -1158,12 +1159,12 @@ void show_advanced_menu()
 		{
 		  case 0:
 		  {
-		       __system("chmod 644 /sys/class/timed_output/vibrator/enable");
+		      vib=1;
 		      break;
 		  }
 		  case 1:
 		  {
-		      __system("chmod 444 /sys/class/timed_output/vibrator/enable");
+		      vib=0;
 		      break;
 		  }
 		}
