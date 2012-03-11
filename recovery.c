@@ -812,6 +812,9 @@ prompt_and_wait() {
             case ITEM_REBOOT_MENU:
                 show_reboot_menu();
                 break;
+	    case ITEM_SETTING:
+                show_setting_menu();
+                break;
         }
     }
 }

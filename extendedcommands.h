@@ -47,6 +47,8 @@ void show_reboot_menu();
 
 void show_wipe_menu();
 
+void show_setting_menu();
+
 int format_unknown_device(const char *device, const char* path, const char *fs_type);
 
 void

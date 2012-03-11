@@ -1092,6 +1092,116 @@ void show_reboot_menu()
     }
 }
 
+void show_setting_menu()
+{
+    static char* headers[] = {  EXPAND(RECOVERY_VERSION),
+				"",
+				"Setting & Interface Menu",
+                                "",
+                                NULL
+    };
+    
+    static char* list[] = { "Enable/Disable Vibrate",
+                            "Enable/Disable OnScreen Button",
+                            "Set Brightness Level",
+                            NULL
+    };
+    
+    for (;;)
+    {
+	int chosen_item = get_menu_selection(headers, list, 0, 0);
+        if (chosen_item == GO_BACK)
+            break;
+        switch (chosen_item)
+	{
+	    case 0:
+	    {
+		static char* vibrate_stat[] = { "Enable",
+						"Disable",
+						 NULL };
+					     
+		static char* vibrate_headers[] = { "Enable/Disable Vibrate", "", NULL };
+		
+		int vibra = get_menu_selection(vibrate_headers, vibrate_stat, 0, 0);
+                if (vibra == GO_BACK)
+                    break;
+		switch (vibra)
+		{
+		  case 0:
+		  {
+		      vib=1;
+		      break;
+		  }
+		  case 1:
+		  {
+		      vib=0;
+		      break;
+		  }
+		}
+	      break;
+	    }
+            case 1:
+	    {
+		static char* onscreen_stat[] = { "Enable",
+						 "Disable",
+						 NULL };
+					     
+		static char* onscreen_headers[] = { "Enable/Disable OnScreen Button", "", NULL };
+		
+		int osbutton = get_menu_selection(onscreen_headers, onscreen_stat, 0, 0);
+                if (osbutton == GO_BACK)
+                    break;
+		switch (osbutton)
+		{
+		  case 0:
+		  {
+		      osb=1;
+		      break;
+		  }
+		  case 1:
+		  {
+		      osb=0;
+		      break;
+		  }
+		}
+	      break;
+	    }
+            case 2:
+	    {
+		static char* brightness_level[] = { "Low",
+						    "Medium",
+						    "High",
+						     NULL };
+					     
+		static char* brightness_headers[] = { "Brightness Level", "", NULL };
+		
+		int brightness = get_menu_selection(brightness_headers, brightness_level, 0, 0);
+                if (brightness == GO_BACK)
+                    break;
+		switch (brightness)
+		{
+		  case 0:
+		  {
+		      __system("echo 1 > /sys/class/leds/lcd-backlight/brightness");
+		      break;
+		  }
+		  case 1:
+		  {
+		      __system("echo 75 > /sys/class/leds/lcd-backlight/brightness");
+		      break;
+		  }
+		  case 2:
+		  {
+		      __system("echo 200 > /sys/class/leds/lcd-backlight/brightness");
+		      break;
+		  }
+		}
+	      break;
+	    }
+	}
+    }
+}
+
 void show_advanced_menu()
 {
     static char* headers[] = {  EXPAND(RECOVERY_VERSION),
@@ -1101,14 +1211,11 @@ void show_advanced_menu()
                                 NULL
     };
 
-    static char* list[] = { "Enable/Disable Vibrate",
-			    "Enable/Disable OnScreen Button",
-			    "Report Error",
+    static char* list[] = { "Report Error",
                             "Key Test",
                             "Show log",
                             "Partition SD Card",
                             "Fix Permissions",
-			    "Set Brightness Level",
                             NULL
     };
 
@@ -1146,62 +1253,10 @@ void show_advanced_menu()
                 break;
             }
             */
-	    case 0:
-	    {
-		static char* vibrate_stat[] = { "Enable",
-						"Disable",
-						 NULL };
-					     
-		static char* vibrate_headers[] = { "Enable/Disable Vibrate", "", NULL };
-		
-		int vibra = get_menu_selection(vibrate_headers, vibrate_stat, 0, 0);
-                if (vibra == GO_BACK)
-                    break;
-		switch (vibra)
-		{
-		  case 0:
-		  {
-		      vib=1;
-		      break;
-		  }
-		  case 1:
-		  {
-		      vib=0;
-		      break;
-		  }
-		}
-	      break;
-	    }
-	    case 1:
-	    {
-		static char* onscreen_stat[] = { "Enable",
-						 "Disable",
-						 NULL };
-					     
-		static char* onscreen_headers[] = { "Enable/Disable OnScreen Button", "", NULL };
-		
-		int osbutton = get_menu_selection(onscreen_headers, onscreen_stat, 0, 0);
-                if (osbutton == GO_BACK)
-                    break;
-		switch (osbutton)
-		{
-		  case 0:
-		  {
-		      osb=1;
-		      break;
-		  }
-		  case 1:
-		  {
-		      osb=0;
-		      break;
-		  }
-		}
-	      break;
-	    }
-            case 2:
+            case 0:
                 handle_failure(1);
                 break;
-            case 3:
+            case 1:
             {
                 ui_print("Outputting key codes.\n");
                 ui_print("Go back to end debugging.\n");
@@ -1228,12 +1283,12 @@ void show_advanced_menu()
                 while (action != GO_BACK);
                 break;
             }
-            case 4:
+            case 2:
             {
                 ui_printlogtail(12);
                 break;
             }
-            case 5:
+            case 3:
             {
                if (confirm_selection("Confirm: SDCARD will be wiped!!", "Yes - Continue with SDCARD Partitioning"))
                 {
@@ -1292,7 +1347,7 @@ void show_advanced_menu()
 
                 break;
             }
-            case 6:
+            case 4:
             {
                 ensure_path_mounted("/system");
                 ensure_path_mounted("/data");
@@ -1301,38 +1356,6 @@ void show_advanced_menu()
                 ui_print("Done!\n");
                 break;
             }
-            case 7:
-	    {
-		static char* brightness_level[] = { "Low",
-						    "Medium",
-						    "High",
-						     NULL };
-					     
-		static char* brightness_headers[] = { "Brightness Level", "", NULL };
-		
-		int brightness = get_menu_selection(brightness_headers, brightness_level, 0, 0);
-                if (brightness == GO_BACK)
-                    break;
-		switch (brightness)
-		{
-		  case 0:
-		  {
-		      __system("echo 1 > /sys/class/leds/lcd-backlight/brightness");
-		      break;
-		  }
-		  case 1:
-		  {
-		      __system("echo 75 > /sys/class/leds/lcd-backlight/brightness");
-		      break;
-		  }
-		  case 2:
-		  {
-		      __system("echo 200 > /sys/class/leds/lcd-backlight/brightness");
-		      break;
-		  }
-		}
-	      break;
-	    }
         }
     }
 }

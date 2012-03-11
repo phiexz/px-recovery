@@ -74,6 +74,7 @@ int device_wipe_data();
 #define ITEM_INSTALL_ZIP     5
 #define ITEM_NANDROID        6
 #define ITEM_ADVANCED        7
+#define ITEM_SETTING         8
           
 
 // Header text to display above the main menu.
