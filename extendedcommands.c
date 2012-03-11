@@ -1018,7 +1018,10 @@ void show_wipe_menu()
 		    if (has_datadata()) {
 			erase_volume("/datadata");
 		    }
-		    erase_volume("/sd-ext");
+		    ui_print("Wiping sd-ext...\n");
+		    ensure_path_mounted("/sd-ext");
+		    __system("rm -r /sd-ext");
+		    ensure_path_unmounted("/sd-ext");
 		    erase_volume("/sdcard/.android_secure");
 		    ui_print("Factory Reset complete.\n");
                     if (!ui_text_visible()) return;
