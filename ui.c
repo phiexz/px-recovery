@@ -270,11 +270,12 @@ static void draw_screen_locked(void)
         int offset = 0;         // offset of separating bar under menus
         int row = 0;            // current row that we are drawing on
         if (show_menu) {
-
-      draw_icon_locked(gMenuIcon[MENU_BACK], MENU_ICON[MENU_BACK].x, MENU_ICON[MENU_BACK].y );
-      draw_icon_locked(gMenuIcon[MENU_DOWN], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
-      draw_icon_locked(gMenuIcon[MENU_UP], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
-      draw_icon_locked(gMenuIcon[MENU_SELECT], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
+	  if (osb!=0){
+	      draw_icon_locked(gMenuIcon[MENU_BACK], MENU_ICON[MENU_BACK].x, MENU_ICON[MENU_BACK].y );
+	      draw_icon_locked(gMenuIcon[MENU_DOWN], MENU_ICON[MENU_DOWN].x, MENU_ICON[MENU_DOWN].y);
+	      draw_icon_locked(gMenuIcon[MENU_UP], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
+	      draw_icon_locked(gMenuIcon[MENU_SELECT], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
+	  }
             gr_color(MENU_TEXT_COLOR);
             gr_fill(0, (menu_top + menu_sel - menu_show_start) * CHAR_HEIGHT,
                     gr_fb_width(), (menu_top + menu_sel - menu_show_start + 1)*CHAR_HEIGHT+1);
@@ -314,8 +315,14 @@ static void draw_screen_locked(void)
 
         gr_color(NORMAL_TEXT_COLOR);
         int cur_row = text_row;
-        int available_rows = total_rows - row - 3;
-        int start_row = row + 1;
+	int available_rows;
+	if (osb!=0){
+	  available_rows = total_rows - row - 3;
+	}
+        else{
+	  available_rows = total_rows - row - 1;
+	}
+	int start_row = row + 1;
         if (available_rows < MAX_ROWS)
             cur_row = (cur_row + (MAX_ROWS - available_rows)) % MAX_ROWS;
         else
@@ -392,7 +399,7 @@ int device_handle_mouse(struct keyStruct *key, int visible)
     {  get_menu_icon_info(MENU_SELECT,MENU_ICON_X),  get_menu_icon_info(MENU_SELECT,MENU_ICON_Y), get_menu_icon_info(MENU_SELECT,MENU_ICON_XL), get_menu_icon_info(MENU_SELECT,MENU_ICON_XR) },
   };
 
-  if (visible) {
+  if ((visible) && osb!=0) {
   int position;
   int positionY;
 
@@ -442,7 +449,7 @@ if(TOUCH_CONTROL_DEBUG)
   ui_print("Touch X:\t%d,\tY:\t%d\n",curPos[1],curPos[2]);
 }
 
-  if (show_menu) {
+  if ((show_menu) && (osb!=0)) {
     if (curPos[0] > 0) {
     int position;
 

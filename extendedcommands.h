@@ -70,3 +70,7 @@ int run_and_remove_extendedcommand();
 
 //vibrate
 int vib;
+
+//onscreen button
+int osb;
+

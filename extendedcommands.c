@@ -46,6 +46,7 @@
 #define ABS_MT_POSITION_X 0x35  /* Center X ellipse position */
 
 int vib = 1;
+int osb = 1;
 int signature_check_enabled = 1;
 int script_assert_enabled = 1;
 static const char *SDCARD_UPDATE_FILE = "/sdcard/update.zip";
@@ -1101,6 +1102,7 @@ void show_advanced_menu()
     };
 
     static char* list[] = { "Enable/Disable Vibrate",
+			    "Enable/Disable OnScreen Button",
 			    "Report Error",
                             "Key Test",
                             "Show log",
@@ -1170,10 +1172,36 @@ void show_advanced_menu()
 		}
 	      break;
 	    }
-            case 1:
+	    case 1:
+	    {
+		static char* onscreen_stat[] = { "Enable",
+						 "Disable",
+						 NULL };
+					     
+		static char* onscreen_headers[] = { "Enable/Disable OnScreen Button", "", NULL };
+		
+		int osbutton = get_menu_selection(onscreen_headers, onscreen_stat, 0, 0);
+                if (osbutton == GO_BACK)
+                    break;
+		switch (osbutton)
+		{
+		  case 0:
+		  {
+		      osb=1;
+		      break;
+		  }
+		  case 1:
+		  {
+		      osb=0;
+		      break;
+		  }
+		}
+	      break;
+	    }
+            case 2:
                 handle_failure(1);
                 break;
-            case 2:
+            case 3:
             {
                 ui_print("Outputting key codes.\n");
                 ui_print("Go back to end debugging.\n");
@@ -1200,12 +1228,12 @@ void show_advanced_menu()
                 while (action != GO_BACK);
                 break;
             }
-            case 3:
+            case 4:
             {
                 ui_printlogtail(12);
                 break;
             }
-            case 4:
+            case 5:
             {
                if (confirm_selection("Confirm: SDCARD will be wiped!!", "Yes - Continue with SDCARD Partitioning"))
                 {
@@ -1264,7 +1292,7 @@ void show_advanced_menu()
 
                 break;
             }
-            case 5:
+            case 6:
             {
                 ensure_path_mounted("/system");
                 ensure_path_mounted("/data");
@@ -1273,7 +1301,7 @@ void show_advanced_menu()
                 ui_print("Done!\n");
                 break;
             }
-            case 6:
+            case 7:
 	    {
 		static char* brightness_level[] = { "Low",
 						    "Medium",
