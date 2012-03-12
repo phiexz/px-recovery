@@ -1107,6 +1107,7 @@ void show_setting_menu()
     static char* list[] = { "Enable/Disable Vibrate",
                             "Enable/Disable OnScreen Button",
                             "Set Brightness Level",
+			    "Set Timezone",
                             NULL
     };
     
@@ -1133,11 +1134,19 @@ void show_setting_menu()
 		  case 0:
 		  {
 		      vib=1;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 1 > /sdcard/.px-recovery/settings/vibrate");
+		      ensure_path_unmounted("/sdcard");
 		      break;
 		  }
 		  case 1:
 		  {
 		      vib=0;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 0 > /sdcard/.px-recovery/settings/vibrate");
+		      ensure_path_unmounted("/sdcard");
 		      break;
 		  }
 		}
@@ -1159,11 +1168,19 @@ void show_setting_menu()
 		  case 0:
 		  {
 		      osb=1;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 1 > /sdcard/.px-recovery/settings/osbutton");
+		      ensure_path_unmounted("/sdcard");
 		      break;
 		  }
 		  case 1:
 		  {
 		      osb=0;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 0 > /sdcard/.px-recovery/settings/osbutton");
+		      ensure_path_unmounted("/sdcard");
 		      break;
 		  }
 		}
@@ -1186,16 +1203,292 @@ void show_setting_menu()
 		  case 0:
 		  {
 		      __system("echo 1 > /sys/class/leds/lcd-backlight/brightness");
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 1 > /sdcard/.px-recovery/settings/brightness");
+		      ensure_path_unmounted("/sdcard");
 		      break;
 		  }
 		  case 1:
 		  {
 		      __system("echo 75 > /sys/class/leds/lcd-backlight/brightness");
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 2 > /sdcard/.px-recovery/settings/brightness");
+		      ensure_path_unmounted("/sdcard");
 		      break;
 		  }
 		  case 2:
 		  {
 		      __system("echo 200 > /sys/class/leds/lcd-backlight/brightness");
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 3 > /sdcard/.px-recovery/settings/brightness");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		}
+	      break;
+	    }
+	    case 3:
+	    {
+		static char* time_stat[] = { "GMT -11:00",
+					     "GMT -10:00",
+					     "GMT -09:00",
+					     "GMT -08:00",
+					     "GMT -07:00",
+					     "GMT -06:00",
+					     "GMT -05:00",
+					     "GMT -04:00",
+					     "GMT -03:00",
+					     "GMT -02:00",
+					     "GMT -01:00",
+					     "GMT +00:00",
+					     "GMT +01:00",
+					     "GMT +02:00",
+					     "GMT +03:00",
+					     "GMT +04:00",
+					     "GMT +05:00",
+					     "GMT +06:00",
+					     "GMT +07:00",
+					     "GMT +08:00",
+					     "GMT +09:00",
+					     "GMT +10:00",
+					     "GMT +11:00",
+					     "GMT +12:00",
+					     "GMT +13:00",
+					      NULL };
+					     
+		static char* time_headers[] = { "Select your timezone!", "", NULL };
+		
+		int timem = get_menu_selection(time_headers, time_stat, 0, 0);
+                if (timem == GO_BACK)
+                    break;
+		switch (timem)
+		{
+		  case 0:
+		  {
+		      glo_timezone=-11;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -11 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 1:
+		  {
+		      glo_timezone=-10;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -10 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 2:
+		  {
+		      glo_timezone=-9;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -9 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 3:
+		  {
+		    glo_timezone=-8;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -8 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 4:
+		  {
+		    glo_timezone=-7;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -7 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 5:
+		  {
+		    glo_timezone=-6;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -6 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 6:
+		  {
+		    glo_timezone=-5;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -5 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 7:
+		  {
+		    glo_timezone=-4;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -4 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 8:
+		  {
+		    glo_timezone=-3;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -3 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 9:
+		  {
+		    glo_timezone=-2;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -2 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 10:
+		  {
+		    glo_timezone=-1;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo -1 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 11:
+		  {
+		    glo_timezone=0;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 0 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 12:
+		  {
+		    glo_timezone=1;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 1 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 13:
+		  {
+		    glo_timezone=2;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 2 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 14:
+		  {
+		    glo_timezone=3;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 3 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 15:
+		  {
+		    glo_timezone=4;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 4 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 16:
+		  {
+		    glo_timezone=5;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 5 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 17:
+		  {
+		    glo_timezone=6;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 6 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 18:
+		  {
+		    glo_timezone=7;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 7 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 19:
+		  {
+		    glo_timezone=8;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 8 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 20:
+		  {
+		    glo_timezone=9;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 9 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 21:
+		  {
+		    glo_timezone=10;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 10 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 22:
+		  {
+		    glo_timezone=11;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 11 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 23:
+		  {
+		    glo_timezone=12;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 12 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
+		      break;
+		  }
+		  case 24:
+		  {
+		    glo_timezone=13;
+		      ensure_path_mounted("/sdcard");
+		      __system("mkdir -p /sdcard/.px-recovery/settings");
+		      __system("echo 13 > /sdcard/.px-recovery/settings/timezone");
+		      ensure_path_unmounted("/sdcard");
 		      break;
 		  }
 		}

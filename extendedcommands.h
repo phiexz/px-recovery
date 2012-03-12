@@ -76,3 +76,5 @@ int vib;
 //onscreen button
 int osb;
 
+//timezone
+int glo_timezone;

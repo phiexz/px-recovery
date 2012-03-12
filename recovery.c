@@ -428,6 +428,104 @@ copy_sideloaded_package(const char* original_path) {
   return strdup(copy_path);
 }
 
+void get_settings(){
+  int vib_save,osb_save,brg_save,time_save;
+  ensure_path_mounted("/sdcard");
+  FILE *fv;
+  fv = fopen ("/sdcard/.px-recovery/settings/vibrate", "r");
+  if (fv==NULL){
+    ui_print("vibrate setting not found\nusing default: Enable\n");
+    __system("mkdir -p /sdcard/.px-recovery/settings");
+    __system("echo 1 > /sdcard/.px-recovery/settings/vibrate");
+    get_settings();
+  }
+  if (fv!=NULL){
+    fscanf(fv,"%d",&vib_save);
+    if (vib_save==0)
+      vib=0;
+    else
+      vib=1;
+  }
+  fclose(fv);
+  
+  FILE *fo;
+  fo = fopen ("/sdcard/.px-recovery/settings/osbutton", "r");
+  if (fo==NULL){
+    ui_print("onscreen button setting not found\nusing default: Enable\n");
+    __system("mkdir -p /sdcard/.px-recovery/settings");
+    __system("echo 1 > /sdcard/.px-recovery/settings/osbutton");
+    get_settings();
+  }
+  if (fo!=NULL){
+    fscanf(fo,"%d",&osb_save);
+    if (osb_save==0)
+      osb=0;
+    else
+      osb=1;
+  }
+  fclose(fo);
+  
+  FILE *fb;
+  fb = fopen ("/sdcard/.px-recovery/settings/brightness", "r");
+  if (fb==NULL){
+    ui_print("Brightness setting not found\nusing default: High\n");
+    __system("mkdir -p /sdcard/.px-recovery/settings");
+    __system("echo 3 > /sdcard/.px-recovery/settings/brightness");
+    get_settings();
+  }
+  if (fb!=NULL){
+    fscanf(fb,"%d",&brg_save);
+    if (brg_save==1)
+      __system("echo 1 > /sys/class/leds/lcd-backlight/brightness");
+    else if(brg_save==2)
+      __system("echo 75 > /sys/class/leds/lcd-backlight/brightness");
+    else
+      __system("echo 200 > /sys/class/leds/lcd-backlight/brightness");
+  }
+  fclose(fb);
+  
+  FILE *ft;
+  ft = fopen ("/sdcard/.px-recovery/settings/timezone", "r");
+  if (ft==NULL){
+    ui_print("Timezone setting not found\nusing default: GMT+0\n");
+    __system("mkdir -p /sdcard/.px-recovery/settings");
+    __system("echo 0 > /sdcard/.px-recovery/settings/timezone");
+    get_settings();
+  }
+  if (ft!=NULL){
+    fscanf(fb,"%d",&time_save);
+    glo_timezone=time_save;
+    /*if (time_save==1)
+      __system("echo 1 > /sys/class/leds/lcd-backlight/brightness");
+    else if(brg_save==2)
+      __system("echo 75 > /sys/class/leds/lcd-backlight/brightness");
+    else
+      __system("echo 200 > /sys/class/leds/lcd-backlight/brightness");*/
+  }
+  fclose(ft);
+  
+  ensure_path_unmounted("/sdcard");
+}
+
+/*void apply_settings(){
+  if (vib_save==0)
+    vib=0;
+  else
+    vib=1;
+  
+  if (osb_save==0)
+    osb=0;
+  else
+    osb=1;
+  
+  if (brg_save==1)
+    __system("echo 1 > /sys/class/leds/lcd-backlight/brightness");
+  else if (brg_save==2)
+    __system("echo 75 > /sys/class/leds/lcd-backlight/brightness");
+  else
+    __system("echo 200 > /sys/class/leds/lcd-backlight/brightness");
+}*/
+
 int get_battery_level(void)
 {
     static int lastVal = -1;
@@ -452,6 +550,17 @@ int get_battery_level(void)
     return lastVal;
 }
 
+/*int fix_hour(){
+  time_hour=current->tm_hour;
+  time_fix=glo_timezone+tm_hour;
+  if (time_fix>24)
+    time_fix=time_fix-24;
+  else if (time_fix<0)
+    time_fix=time_fix+24;
+  else
+    time_fix=time_fix;
+}*/
+
 char* 
 print_batt_cap()  {
 	char* full_cap_s = (char*)malloc(30);
@@ -464,8 +573,16 @@ print_batt_cap()  {
 	time_t now;
 	now = time(0);
 	current = localtime(&now);
+	int time_fix;
+	time_fix=glo_timezone+current->tm_hour;
+	if (time_fix>24)
+	  time_fix=time_fix-24;
+	else if (time_fix<0)
+	  time_fix=time_fix+24;
+	else
+	  time_fix=time_fix;
 	
-	sprintf(full_cap_a, "   |Batt: %i%% | Time: %02D:%02D|", cap_i, current->tm_hour, current->tm_min);
+	sprintf(full_cap_a, "   |Batt: %i%% | Time: %02D:%02D|", cap_i, time_fix, current->tm_min);
 	strcpy(full_cap_s, full_cap_a);
 	
 	return full_cap_s;
@@ -740,6 +857,7 @@ wipe_data(int confirm) {
 
 static void
 prompt_and_wait() {
+  get_settings();
     char** headers = prepend_title((const char**)MENU_HEADERS);
 
     for (;;) {
