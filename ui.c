@@ -51,7 +51,7 @@ extern int __system(const char *command);
 #ifdef BOARD_HAS_NO_SELECT_BUTTON
 static int gShowBackButton = 1;
 #else
-static int gShowBackButton = 1;
+static int gShowBackButton = 0;
 #endif
 
 #define MAX_COLS 96
@@ -829,10 +829,10 @@ int ui_start_menu(char** headers, char** items, int initial_selection) {
             menu[i][MENU_MAX_COLS-1] = '\0';
         }
 
-        if (gShowBackButton) {
+        /*if (gShowBackButton) {
             strcpy(menu[i], " - +++++Go Back+++++");
             ++i;
-        }
+        }*/
 
         strcpy(menu[i], " ");
         ++i;
