@@ -1512,6 +1512,7 @@ void show_advanced_menu()
                             "Show log",
                             "Partition SD Card",
                             "Fix Permissions",
+			    "Info",
                             NULL
     };
 
@@ -1650,6 +1651,171 @@ void show_advanced_menu()
                 ui_print("Fixing permissions...\n");
                 __system("fix_permissions");
                 ui_print("Done!\n");
+                break;
+            }
+            case 5:
+            {
+		static char* info_item[] = { "Disk",
+					     "Memory",
+					      NULL };
+					     
+		static char* info_headers[] = { "Select info do you want", "", NULL };
+		
+		int info = get_menu_selection(info_headers, info_item, 0, 0);
+                if (info == GO_BACK)
+                    break;
+		switch (info)
+		{
+		  case 0:
+		  {
+		    ensure_path_mounted("/system");
+		    FILE *pfp;
+		    char line[100];
+		    void read_partition(){
+		      for ( fgets(line, sizeof(line), pfp); fgets(line, sizeof(line), pfp); ){
+			  
+		      }
+		      __system("mkdir -p /tmp/px-recovery");
+		      
+		      FILE *disko;
+		      disko = fopen("/tmp/px-recovery/disk", "w");
+		      fprintf(disko, "%s",line);
+		      fclose(disko);
+		      
+		      FILE *disk;
+		      disk = fopen("/tmp/px-recovery/disk", "r");
+			
+		      char fs[100],size[100],used[100],avail[100],usep[100],mount[100];
+		      fscanf(disk,"\n\n\n\n%s\t%s\t%s\t%s\t%s\t%s",fs,size,used,avail,usep,mount);
+		      ui_print("---------------------\n");
+		      ui_print("size\t\t\t\t: %sB\n",size);
+		      ui_print("used\t\t\t\t: %sB, %s\n",used,usep);
+		      ui_print("avail\t\t\t: %sB\n",avail);
+		      ui_print("location: %s\n\t",fs);
+		      fclose(disk);
+		      ensure_path_unmounted("/system");
+		    }
+		    static char* disk_item[] = { "System",
+						 "Data",
+						 "Cache",
+						 "Sdcard",
+						 "Sd-Ext",
+						  NULL };
+						
+		    static char* disk_headers[] = { "Select partition do you want", "", NULL };
+		    
+		    int disk = get_menu_selection(disk_headers, disk_item, 0, 0);
+		    if (disk == GO_BACK)
+			break;
+		    switch(disk)
+		    {
+		      case 0:
+		      {
+			ensure_path_mounted("/system");
+			if( (pfp=popen("df -h /system", "r")) == NULL )
+			{
+			  fprintf(stderr, "POPEN Error\n");
+			  exit(1);
+			}
+			ui_print("\n---------------------\n");
+			ui_print("SYSTEM Partition info\n");
+			read_partition();
+			ensure_path_unmounted("/system");
+			break;
+		      }
+		      
+		      case 1:
+		      {
+			ensure_path_mounted("/data");
+			if( (pfp=popen("df -h /data", "r")) == NULL )
+			{
+			  fprintf(stderr, "POPEN Error\n");
+			  exit(1);
+			}
+			ui_print("\n---------------------\n");
+			ui_print("DATA Partition info\n");
+			read_partition();
+			ensure_path_unmounted("/data");
+			break;
+		      }
+		      
+		      case 2:
+		      {
+			ensure_path_mounted("/cache");
+			if( (pfp=popen("df -h /cache", "r")) == NULL )
+			{
+			  fprintf(stderr, "POPEN Error\n");
+			  exit(1);
+			}
+			ui_print("\n---------------------\n");
+			ui_print("CACHE Partition info\n");
+			read_partition();
+			break;
+		      }
+		      
+		      case 3:
+		      {
+			ensure_path_mounted("/sdcard");
+			if( (pfp=popen("df -h /sdcard", "r")) == NULL )
+			{
+			  fprintf(stderr, "POPEN Error\n");
+			  exit(1);
+			}
+			ui_print("\n---------------------\n");
+			ui_print("SDCARD Partition info\n");
+			read_partition();
+			ensure_path_unmounted("/sdcard");
+			break;
+		      }
+		      
+		      case 4:
+		      {
+			ensure_path_mounted("/sd-ext");
+			if( (pfp=popen("df -h /sd-ext", "r")) == NULL )
+			{
+			  fprintf(stderr, "POPEN Error\n");
+			  exit(1);
+			}
+			ui_print("\n---------------------\n");
+			ui_print("SD-EXT Partition info\n");
+			read_partition();
+			ensure_path_unmounted("/sd-ext");
+			break;
+		      }		      
+		    }
+		    break;
+		  }
+		  case 1:
+		  {
+		      ensure_path_mounted("/system");
+		      ui_print("\n-----------\n");
+		      ui_print("MEMORY INFO\n");
+		      ui_print("-----------\n");
+		      FILE *pfp;
+		      char line[100];
+		      if( (pfp=popen("grep MemTotal /proc/meminfo", "r")) == NULL )
+		      {
+			fprintf(stderr, "POPEN Error\n");
+			exit(1);
+		      }
+		      for ( fgets(line, sizeof(line), pfp); fgets(line, sizeof(line), pfp); ){
+		      }
+
+		      ui_print("%s",line);
+		      
+		      FILE *pfq;
+		      if( (pfq=popen("grep MemFree /proc/meminfo", "r")) == NULL )
+		      {
+			fprintf(stderr, "POPEN Error\n");
+			exit(1);
+		      }
+		      for ( fgets(line, sizeof(line), pfq); fgets(line, sizeof(line), pfq); ){
+		      }
+
+		      ui_print("%s",line);
+		      ensure_path_unmounted("/system");
+		  }
+		}
                 break;
             }
         }
