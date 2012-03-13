@@ -68,6 +68,7 @@ static int poweroff = 0;
 static const char *SDCARD_PACKAGE_FILE = "/sdcard/update.zip";
 static const char *TEMPORARY_LOG_FILE = "/tmp/recovery.log";
 static const char *SIDELOAD_TEMP_DIR = "/tmp/sideload";
+int cek=0;
 
 /*
  * The recovery tool communicates with the main system through /cache files.
@@ -437,6 +438,7 @@ void get_settings(){
     ui_print("vibrate setting not found\nusing default: Enable\n");
     __system("mkdir -p /sdcard/.px-recovery/settings");
     __system("echo 1 > /sdcard/.px-recovery/settings/vibrate");
+    cek=cek+1;
     get_settings();
   }
   if (fv!=NULL){
@@ -454,6 +456,7 @@ void get_settings(){
     ui_print("onscreen button setting not found\nusing default: Enable\n");
     __system("mkdir -p /sdcard/.px-recovery/settings");
     __system("echo 1 > /sdcard/.px-recovery/settings/osbutton");
+    cek=cek+1;
     get_settings();
   }
   if (fo!=NULL){
@@ -471,6 +474,7 @@ void get_settings(){
     ui_print("Brightness setting not found\nusing default: High\n");
     __system("mkdir -p /sdcard/.px-recovery/settings");
     __system("echo 3 > /sdcard/.px-recovery/settings/brightness");
+    cek=cek+1;
     get_settings();
   }
   if (fb!=NULL){
@@ -490,19 +494,20 @@ void get_settings(){
     ui_print("Timezone setting not found\nusing default: GMT+0\n");
     __system("mkdir -p /sdcard/.px-recovery/settings");
     __system("echo 0 > /sdcard/.px-recovery/settings/timezone");
+    cek=cek+1;
     get_settings();
   }
   if (ft!=NULL){
     fscanf(fb,"%d",&time_save);
     glo_timezone=time_save;
-    /*if (time_save==1)
-      __system("echo 1 > /sys/class/leds/lcd-backlight/brightness");
-    else if(brg_save==2)
-      __system("echo 75 > /sys/class/leds/lcd-backlight/brightness");
-    else
-      __system("echo 200 > /sys/class/leds/lcd-backlight/brightness");*/
   }
   fclose(ft);
+  if(cek!=0){
+    ui_print("Initialing settings..\n");
+    ui_print("Rebooting...\n");
+    __system("sleep 5");
+    __system("reboot recovery");
+  }
   
   ensure_path_unmounted("/sdcard");
 }
