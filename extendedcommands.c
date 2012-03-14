@@ -896,6 +896,15 @@ void show_nandroid_menu()
                 char backup_path[PATH_MAX];
                 time_t t = time(NULL);
                 struct tm *tmp = localtime(&t);
+		tmp->tm_hour=tmp->tm_hour+glo_timezone;
+		
+		if (tmp->tm_hour>24)
+		  tmp->tm_hour=tmp->tm_hour-24;
+		else if (tmp->tm_hour<0)
+		  tmp->tm_hour=tmp->tm_hour+24;
+		else
+		  tmp->tm_hour=tmp->tm_hour;
+		
                 if (tmp == NULL)
                 {
                     struct timeval tp;
