@@ -321,6 +321,82 @@ int nandroid_backup(const char* backup_path)
     return 0;
 }
 
+int nandroid_backup_advanced(const char* backup_path)
+{
+    ui_set_background(BACKGROUND_ICON_INSTALLING);
+    
+    if (ensure_path_mounted(backup_path) != 0) {
+        return print_and_error("Can't mount backup path.\n");
+    }
+    
+    Volume* volume = volume_for_path(backup_path);
+    if (NULL == volume)
+        return print_and_error("Unable to find volume for backup path.\n");
+    int ret;
+    struct statfs s;
+    if (0 != (ret = statfs(volume->mount_point, &s)))
+        return print_and_error("Unable to stat backup path.\n");
+    uint64_t bavail = s.f_bavail;
+    uint64_t bsize = s.f_bsize;
+    uint64_t sdcard_free = bavail * bsize;
+    uint64_t sdcard_free_mb = sdcard_free / (uint64_t)(1024 * 1024);
+    ui_print("SD Card space free: %lluMB\n", sdcard_free_mb);
+    if (sdcard_free_mb < 150)
+        ui_print("There may not be enough free space to complete backup... continuing...\n");
+    
+    char tmp[PATH_MAX];
+    sprintf(tmp, "mkdir -p %s", backup_path);
+    __system(tmp);
+    
+    if (tmp1!=0){
+	if (0 != (ret = nandroid_backup_partition(backup_path, "/boot")))
+	     return ret;
+    }
+    
+    if (tmp2!=0){
+	if (0 != (ret = nandroid_backup_partition(backup_path, "/system")))
+	     return ret;
+    }
+    
+    if (tmp3!=0){
+	if (0 != (ret = nandroid_backup_partition(backup_path, "/data")))
+	     return ret;
+    }
+    
+    if (tmp4!=0){
+	if (0 != (ret = nandroid_backup_partition(backup_path, "/cache")))
+	     return ret;
+    }
+    
+    if (tmp5!=0){
+	Volume *vol = volume_for_path("/sd-ext");
+	if (vol == NULL || 0 != stat(vol->device, &s))
+	{
+	    ui_print("No sd-ext found. Skipping backup of sd-ext.\n");
+	}
+	else
+	{
+	    if (0 != ensure_path_mounted("/sd-ext"))
+		ui_print("Could not mount sd-ext. sd-ext backup may not be supported on this device. Skipping backup of sd-ext.\n");
+	    else if (0 != (ret = nandroid_backup_partition(backup_path, "/sd-ext")))
+		return ret;
+	}
+    }
+    
+    ui_print("Generating md5 sum...\n");
+    sprintf(tmp, "nandroid-md5.sh %s", backup_path);
+    if (0 != (ret = __system(tmp))) {
+        ui_print("Error while generating md5 sum!\n");
+        return ret;
+    }
+    
+    sync();
+    ui_set_background(BACKGROUND_ICON_CLOCKWORK);
+    ui_reset_progress();
+    ui_print("\nBackup complete!\n");
+    return 0;
+}
+
 typedef int (*format_function)(char* root);
 
 static void ensure_directory(const char* dir) {

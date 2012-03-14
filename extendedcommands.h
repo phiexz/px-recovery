@@ -78,3 +78,6 @@ int osb;
 
 //timezone
 int glo_timezone;
+
+//advanced backup
+int tmp1,tmp2,tmp3,tmp4,tmp5;

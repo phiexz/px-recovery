@@ -47,6 +47,7 @@
 
 int vib = 1;
 int osb = 1;
+int tmp1=0,tmp2=0,tmp3=0,tmp4=0,tmp5=0;
 int signature_check_enabled = 1;
 int script_assert_enabled = 1;
 static const char *SDCARD_UPDATE_FILE = "/sdcard/update.zip";
@@ -865,6 +866,120 @@ void show_nandroid_advanced_restore_menu(const char* path)
     }
 }
 
+void show_nandroid_advanced_backup_menu(){
+    static char* backup_stat[] = {  "[ ] Backup Boot",
+				    "[ ] Backup System",
+				    "[ ] Backup Data",
+				    "[ ] Backup Cache",
+				    "[ ] Backup Sd-Ext\n",
+				    "Backup NOW!!",
+				    NULL };
+					     
+    static char* backup_headers[] = { "Select partition do you want to backup", "", NULL };
+		
+    int backup_item = get_menu_selection(backup_headers, backup_stat, 0, 0);
+    //if (backup_item == GO_BACK)
+    //break;
+    switch (backup_item){
+    case 0:
+    {
+	if (tmp1==0){
+	    backup_stat[0]="[*] Backup Boot";
+	    tmp1=1;
+	}
+	else{
+	    backup_stat[0]="[ ] Backup Boot";
+	    tmp1=0;
+	}
+	show_nandroid_advanced_backup_menu();
+	break;
+      }
+      case 1:
+    {
+	if (tmp2==0){
+	    backup_stat[1]="[*] Backup System";
+	    tmp2=1;
+	}
+	else{
+	    backup_stat[1]="[ ] Backup System";
+	    tmp2=0;
+	}
+	show_nandroid_advanced_backup_menu();
+	break;
+      }
+      case 2:
+    {
+	if (tmp3==0){
+	    backup_stat[2]="[*] Backup Data";
+	    tmp3=1;
+	}
+	else{
+	    backup_stat[2]="[ ] Backup Data";
+	    tmp3=0;
+	}
+	show_nandroid_advanced_backup_menu();
+	break;
+      }
+      case 3:
+    {
+	if (tmp4==0){
+	    backup_stat[3]="[*] Backup Cache";
+	    tmp4=1;
+	}
+	else{
+	    backup_stat[3]="[ ] Backup Cache";
+	    tmp4=0;
+	}
+	show_nandroid_advanced_backup_menu();
+	break;
+      }
+      case 4:
+    {
+	if (tmp5==0){
+	    backup_stat[4]="[*] Backup Sd-Ext";
+	    tmp5=1;
+	}
+	else{
+	    backup_stat[4]="[ ] Backup Sd-Ext";
+	    tmp5=0;
+	}
+	show_nandroid_advanced_backup_menu();
+	break;
+      }
+      case 5:
+      {
+	  if (confirm_selection("Confirm BACKUP?", "Yes - Start Backup NOW!"))
+               {
+                char backup_path[PATH_MAX];
+                time_t t = time(NULL);
+                struct tm *tmp = localtime(&t);
+		tmp->tm_hour=tmp->tm_hour+glo_timezone;
+		
+		if (tmp->tm_hour>24)
+		  tmp->tm_hour=tmp->tm_hour-24;
+		else if (tmp->tm_hour<0)
+		  tmp->tm_hour=tmp->tm_hour+24;
+		else
+		  tmp->tm_hour=tmp->tm_hour;
+		
+                if (tmp == NULL)
+                {
+                    struct timeval tp;
+                    gettimeofday(&tp, NULL);
+                    sprintf(backup_path, "/sdcard/clockworkmod/backup/%d", tp.tv_sec);
+                }
+                else
+                {
+                    strftime(backup_path, sizeof(backup_path), "/sdcard/clockworkmod/backup/%F.%H.%M.%S", tmp);
+                }
+                nandroid_backup_advanced(backup_path);
+               }
+           break;
+      }
+      break;break;
+    }
+}
+
 void show_nandroid_menu()
 {
     static char* headers[] = {  EXPAND(RECOVERY_VERSION),
@@ -877,6 +992,7 @@ void show_nandroid_menu()
     static char* list[] = { "backup",
                             "restore",
                             "advanced restore",
+			    "advanced backup",
                             "backup to internal sdcard",
                             "restore from internal sdcard",
                             "advanced restore from internal sdcard",
@@ -884,7 +1000,7 @@ void show_nandroid_menu()
     };
 
     if (volume_for_path("/emmc") == NULL)
-        list[3] = NULL;
+        list[4] = NULL;
 
     int chosen_item = get_menu_selection(headers, list, 0, 0);
     switch (chosen_item)
@@ -925,7 +1041,13 @@ void show_nandroid_menu()
         case 2:
             show_nandroid_advanced_restore_menu("/sdcard");
             break;
-        case 3:
+	case 3:
+	{
+	    tmp1=tmp2=tmp3=tmp4=tmp5=0;
+	    show_nandroid_advanced_backup_menu();
+	    break;
+	}
+        case 4:
             {
                 char backup_path[PATH_MAX];
                 time_t t = time(NULL);
@@ -943,10 +1065,10 @@ void show_nandroid_menu()
                 nandroid_backup(backup_path);
             }
             break;
-        case 4:
+        case 5:
             show_nandroid_restore_menu("/emmc");
             break;
-        case 5:
+        case 6:
             show_nandroid_advanced_restore_menu("/emmc");
             break;
     }
