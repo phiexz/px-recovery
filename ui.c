@@ -51,7 +51,7 @@ extern int __system(const char *command);
 #ifdef BOARD_HAS_NO_SELECT_BUTTON
 static int gShowBackButton = 1;
 #else
-static int gShowBackButton = 0;
+static int gShowBackButton = 1;
 #endif
 
 #define MAX_COLS 96
