@@ -239,12 +239,12 @@ static void draw_text_line(int row, const char* t) {
 }
 
 //#define MENU_TEXT_COLOR 255, 160, 49, 255
-#define MENU_TEXT_COLOR 0, 173, 225, 255
+/*#define MENU_TEXT_COLOR 0, 173, 225, 255
 #define NORMAL_TEXT_COLOR 255, 255, 255, 255
 #define HEADER_TEXT_COLOR 255, 255, 255, 255
 #define LINE_COLOR 255, 255, 255, 255
 #define SELECTED_COLOR 255, 255, 255, 255
-#define SELECTED_ROW 255, 255, 255, 100
+#define SELECTED_ROW 255, 255, 255, 100*/
 
 // Redraw everything on the screen.  Does not flip pages.
 // Should only be called with gUpdateMutex locked.
@@ -279,18 +279,18 @@ static void draw_screen_locked(void)
 	      draw_icon_locked(gMenuIcon[MENU_UP], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
 	      draw_icon_locked(gMenuIcon[MENU_SELECT], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
 	  }
-            gr_color(SELECTED_ROW);
+            gr_color(SR[0], SR[1], SR[2], SR[3]);
             gr_fill(0, (menu_top + menu_sel - menu_show_start) * CHAR_HEIGHT,
                     gr_fb_width(), (menu_top + menu_sel - menu_show_start + 1)*CHAR_HEIGHT+1);
 
-            gr_color(HEADER_TEXT_COLOR);
+            gr_color(HTC[0], HTC[1], HTC[2], HTC[3]);
             for (i = 0; i < menu_top; ++i) {
                 draw_text_line(i, menu[i]);
                 row++;
             }
             
 	    //draw line
-	    gr_color (LINE_COLOR);
+	    gr_color (LC[0], LC[1], LC[2], LC[3]);
 	    row--;		//go up one to draw our top line
 	    gr_fill (0, row * CHAR_HEIGHT + CHAR_HEIGHT / 2 - 1,
 		     gr_fb_width (),
@@ -302,14 +302,14 @@ static void draw_screen_locked(void)
             else
                 j = menu_items - menu_show_start;
 
-            gr_color(MENU_TEXT_COLOR);
+            gr_color(MTC[0], MTC[1], MTC[2], MTC[3]);
             for (i = menu_show_start + menu_top; i < (menu_show_start + menu_top + j); ++i) {
                 if (i == menu_top + menu_sel) {
-                    gr_color(SELECTED_COLOR);
+                    gr_color(SC[0], SC[1], SC[2], SC[3]);
                     draw_text_line(i - menu_show_start , menu[i]);
-                    gr_color(SELECTED_COLOR);
+                    gr_color(SC[0], SC[1], SC[2], SC[3]);
                 } else {
-                    gr_color(MENU_TEXT_COLOR);
+                    gr_color(MTC[0], MTC[1], MTC[2], MTC[3]);
                     draw_text_line(i - menu_show_start, menu[i]);
                 }
                 row++;
@@ -320,13 +320,13 @@ static void draw_screen_locked(void)
             if (menu_items <= max_menu_rows)
                 offset = 1;
 
-	    gr_color (LINE_COLOR);
+	    gr_color (LC[0], LC[1], LC[2], LC[3]);
             gr_fill (0, (row-offset) * CHAR_HEIGHT + CHAR_HEIGHT / 2 - 1,
 		     gr_fb_width (),
 		     (row-offset) * CHAR_HEIGHT + CHAR_HEIGHT / 2 + 1);
         }
 
-        gr_color(NORMAL_TEXT_COLOR);
+        gr_color(NTC[0], NTC[1], NTC[2], NTC[3]);
         int cur_row = text_row;
 	int available_rows;
 	if (osb!=0){

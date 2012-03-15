@@ -502,6 +502,63 @@ void get_settings(){
     glo_timezone=time_save;
   }
   fclose(ft);
+  
+  //define default theme
+  MTC[0]=0;
+  MTC[1]=173;
+  MTC[2]=225;
+  MTC[3]=255;
+  NTC[0]=255;
+  NTC[1]=255;
+  NTC[2]=255;
+  NTC[3]=255;
+  HTC[0]=255;
+  HTC[1]=255;
+  HTC[2]=255;
+  HTC[3]=255;
+  LC[0]=255;
+  LC[1]=255;
+  LC[2]=255;
+  LC[3]=255;
+  SC[0]=255;
+  SC[1]=255;
+  SC[2]=255;
+  SC[3]=255;
+  SR[0]=255;
+  SR[1]=255;
+  SR[2]=255;
+  SR[3]=100;
+  
+  //calling theme
+  FILE *fth;
+  if ((fth = fopen ("/sdcard/.px-recovery/settings/theme", "r")) == NULL){
+      ui_print("\nTheme setting not found\n");
+      ui_print("Using default theme\n");
+  }
+  else{
+      char t_path[PATH_MAX];
+      fscanf(fth,"%s",t_path);
+      fclose(fth);
+      char t_path_name[PATH_MAX];
+      sprintf(t_path_name, "%s/config", t_path);
+      
+      FILE *thm;
+      if ((thm = fopen (t_path_name, "r")) == NULL){
+	  ui_print("\nTheme config not found\nUse default theme\n");
+      }
+      else{
+	  fscanf(thm, "%d %d %d %d",&MTC[0],&MTC[1],&MTC[2],&MTC[3]);
+	  fscanf(thm, "%d %d %d %d",&NTC[0],&NTC[1],&NTC[2],&NTC[3]);
+	  fscanf(thm, "%d %d %d %d",&HTC[0],&HTC[1],&HTC[2],&HTC[3]);
+	  fscanf(thm, "%d %d %d %d",&LC[0],&LC[1],&LC[2],&LC[3]);
+	  fscanf(thm, "%d %d %d %d",&SC[0],&SC[1],&SC[2],&SC[3]);
+	  fscanf(thm, "%d %d %d %d",&SR[0],&SR[1],&SR[2],&SR[3]);
+	  fclose(thm);
+	  
+	  fclose(thm);
+      }
+  }
+  
   if(cek!=0){
     ui_print("Initialing settings..\n");
     ui_print("Rebooting...\n");

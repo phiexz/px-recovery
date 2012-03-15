@@ -1239,6 +1239,7 @@ void show_setting_menu()
                             "Enable/Disable OnScreen Button",
                             "Set Brightness Level",
 			    "Set Timezone",
+			    "Set Themes",
                             NULL
     };
     
@@ -1623,6 +1624,33 @@ void show_setting_menu()
 		      break;
 		  }
 		}
+	      break;
+	    }
+	    case 4:
+	    {
+		ensure_path_mounted("/sdcard");
+		
+		static char* themes_headers[] = { EXPAND(RECOVERY_VERSION),
+						  "Themes Menu",
+						  "",
+						  "Choose your theme",
+						  NULL 
+		};
+		
+		char tmp[PATH_MAX];
+		sprintf(tmp, "/sdcard/.px-recovery/themes/");
+		char* file = choose_file_menu(tmp, NULL, themes_headers);
+		if (file == NULL)
+		    return;
+		
+		if (confirm_selection("Confirm theme?", "Yes - apply theme")){
+		    FILE *thm;
+		    thm = fopen ("/sdcard/.px-recovery/settings/theme", "w");
+		    fprintf(thm,"%s",file);
+		    fclose(thm);
+		    ui_print("\nplease reboot to apply theme\n");
+		}
+	      ensure_path_unmounted("/sdcard");
 	      break;
 	    }
 	}

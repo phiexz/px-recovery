@@ -81,3 +81,6 @@ int glo_timezone;
 
 //advanced backup
 int tmp1,tmp2,tmp3,tmp4,tmp5;
+
+//THEME
+int MTC[4],NTC[4], HTC[4], LC[4], SC[4], SR[4];
