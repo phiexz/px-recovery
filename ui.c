@@ -244,6 +244,7 @@ static void draw_text_line(int row, const char* t) {
 #define HEADER_TEXT_COLOR 255, 255, 255, 255
 #define LINE_COLOR 255, 255, 255, 255
 #define SELECTED_COLOR 255, 255, 255, 255
+#define SELECTED_ROW 255, 255, 255, 100
 
 // Redraw everything on the screen.  Does not flip pages.
 // Should only be called with gUpdateMutex locked.
@@ -278,7 +279,7 @@ static void draw_screen_locked(void)
 	      draw_icon_locked(gMenuIcon[MENU_UP], MENU_ICON[MENU_UP].x, MENU_ICON[MENU_UP].y );
 	      draw_icon_locked(gMenuIcon[MENU_SELECT], MENU_ICON[MENU_SELECT].x, MENU_ICON[MENU_SELECT].y );
 	  }
-            gr_color(255, 255, 255, 100);
+            gr_color(SELECTED_ROW);
             gr_fill(0, (menu_top + menu_sel - menu_show_start) * CHAR_HEIGHT,
                     gr_fb_width(), (menu_top + menu_sel - menu_show_start + 1)*CHAR_HEIGHT+1);
 
@@ -306,7 +307,7 @@ static void draw_screen_locked(void)
                 if (i == menu_top + menu_sel) {
                     gr_color(SELECTED_COLOR);
                     draw_text_line(i - menu_show_start , menu[i]);
-                    gr_color(255, 255, 255, 255);
+                    gr_color(SELECTED_COLOR);
                 } else {
                     gr_color(MENU_TEXT_COLOR);
                     draw_text_line(i - menu_show_start, menu[i]);
