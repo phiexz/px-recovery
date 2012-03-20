@@ -875,7 +875,7 @@ void show_nandroid_advanced_backup_menu(){
 				    "Backup NOW!!",
 				    NULL };
 					     
-    static char* backup_headers[] = { "Select partition do you want to backup", "", NULL };
+    static char* backup_headers[] = { "Select partition", "", NULL };
 		
     int backup_item = get_menu_selection(backup_headers, backup_stat, 0, 0);
     //if (backup_item == GO_BACK)
